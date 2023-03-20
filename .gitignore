@@ -1,0 +1,4 @@
+venv/
+.flaskenv
+.env
+.DS_Store
