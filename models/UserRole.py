@@ -1,7 +1,8 @@
+from random import choices
 import mysql.connector
 from config import DB_CONFIG
 
-class RoleModel:
+class UserRoleModel:
     def __init__(self):
         self.config = DB_CONFIG
     
@@ -15,18 +16,11 @@ class RoleModel:
         self.cursor.close()
         self.conn.close()
 
-    def get_all(self):
+    def get_choices(self):
         try:
-            self.cursor.execute("SELECT * FROM Rolle")
+            self.cursor.execute("SELECT * FROM UserRole ORDER BY name DESC")
             result = self.cursor.fetchall()
-            return result
-        except mysql.connector.Error as err:
-            print(err)
-
-    def get(self, id):
-        try:
-            self.cursor.execute("SELECT navn FROM Rolle WHERE id=(%s)", (id,))
-            result = self.cursor.fetchone()
-            return result
+            choices = [(role[0], role[0]) for role in result]
+            return choices
         except mysql.connector.Error as err:
             print(err)

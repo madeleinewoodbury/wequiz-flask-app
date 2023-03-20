@@ -17,7 +17,7 @@ class UserModel:
 
     def get_user_by_id(self, id):
         try:
-            self.cursor.execute("SELECT * FROM Bruker WHERE id=(%s)", (id,))
+            self.cursor.execute("SELECT * FROM User WHERE id=(%s)", (id,))
             result = self.cursor.fetchone()
         except mysql.connector.Error as err:
                 print(err)
@@ -25,7 +25,7 @@ class UserModel:
     
     def get_user_by_email(self, email):
         try:
-            self.cursor.execute("SELECT * FROM Bruker WHERE epost=(%s)", (email,))
+            self.cursor.execute("SELECT * FROM User WHERE email=(%s)", (email,))
             result = self.cursor.fetchone()
         except mysql.connector.Error as err:
                 print(err)
