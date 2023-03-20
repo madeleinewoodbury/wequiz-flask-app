@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_user, login_required
 from forms.LoginForm import LoginForm
 from models.UserRole import UserRoleModel
@@ -25,16 +25,17 @@ def login():
             user = User(*result)
             if user.check_password(password):
                 login_user(user, remember=True)
+                flash('Logged in successfully!', category='success')
                 if role.lower() == 'administrator':
                     if user.is_admin():
                         return redirect(url_for('views.admin'))
                     else:
-                        print('user not admin')
+                        flash('Not Authorized', category='error')
                 else:
-                    print('hello')
                     return redirect(url_for('views.home'))
-            else:
-                print('wrong credentials')
+                
+            flash('Invalid credentials', category='error')
+
 
 
     return render_template('login.html', form=form)

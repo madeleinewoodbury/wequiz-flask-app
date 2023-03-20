@@ -22,10 +22,35 @@
             </li>
         </ul>
     </nav>
-    <main>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="{{'alert alert-{}'.format(category)}}" role="role" id="flash-message">
+            <p>{{message}}</p>
+            <button type="button" class="close" onclick=removeFlash()>
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         {% block content %}
         {% endblock %}
     </main>
 </body>
+<script>
+    function removeFlash() {
+        const flashMessage = document.getElementById('flash-message');
+        flashMessage.remove();
+    }
+
+    setTimeout(() => {
+        const flashMessage = document.getElementById('flash-message');
+        flashMessage.remove();
+    }, "5000");
+</script>
 
 </html>

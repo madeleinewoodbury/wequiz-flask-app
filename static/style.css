@@ -6,6 +6,7 @@
   --light-color: #f4f4f4;
   --danger-color: #b42937;
   --success-color: #28a745;
+  --grey-color: rgb(175, 175, 175);
 }
 
 * {
@@ -109,6 +110,45 @@ ul {
 
 .navbar a:hover {
   color: var(--success-color);
+}
+
+/* Alerts */
+.alert {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  color: var(--light-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  pointer-events: none;
+  transition: all 0.2s ease-in;
+}
+
+.alert-error {
+  background-color: var(--danger-color);
+}
+
+.alert-success {
+  background-color: var(--success-color);
+}
+
+.alert .close {
+  background: none;
+  color: var(--light-color);
+  border: none;
+  cursor: pointer;
+  outline: none;
+  pointer-events: auto;
+}
+
+.alert .close span {
+  font-size: 2rem;
+}
+
+.alert:hover {
+  opacity: 0.9;
+  background-color: var(--grey-color);
 }
 
 /* Forms */
