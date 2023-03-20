@@ -1,7 +1,14 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
+from forms.LoginForm import LoginForm
 
 views = Blueprint('views', __name__)
 
-@views.route('/')
+@views.route('/', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    form = LoginForm()
+
+    if request.method == 'POST':
+        print(form.role.data)
+        print(form.email.data)
+        print(form.password.data)
+    return render_template('login.html', form=form)
