@@ -14,7 +14,8 @@ def login():
         result = db.get_choices()
         form.role.choices = result
 
-    if request.method == 'POST':
+    if form.validate_on_submit():
+        print('hey')
         role = form.role.data
         email = form.email.data
         password = form.password.data
@@ -36,7 +37,11 @@ def login():
                 
             flash('Invalid credentials', category='error')
 
-
+    if form.errors:
+        print(form.errors)
+        for message in form.errors.values():
+            flash(message, category='error')
+        
 
     return render_template('login.html', form=form)
 
