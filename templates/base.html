@@ -15,6 +15,11 @@
         </h1>
         <ul>
             {% if user and user.is_authenticated %}
+            {% if user.is_admin() %}
+            <li>
+                <a href={{url_for('views.quiz')}}>Ny Quiz</a>
+            </li>
+            {% endif %}
             <li>
                 <a href={{url_for('views.logout')}}>Logg Ut</a>
             </li>

@@ -2,9 +2,11 @@ from hashlib import new
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user
 from forms.LoginForm import LoginForm
+from forms.QuizForm import QuizForm
 from forms.RegisterForm import RegisterForm
 from models.UserRole import UserRoleModel
 from models.User import UserModel
+from models.Quiz import QuizModel
 from user import User
 from uuid import uuid4
 
@@ -99,3 +101,23 @@ def home():
 def logout():
     logout_user()
     return redirect(url_for('views.login'))
+
+@views.route('/quiz', methods=['GET', 'POST'])
+@login_required
+def quiz():
+    if current_user.is_admin():
+        form = QuizForm()
+        if form.validate_on_submit():
+            title = form.title.data
+            with QuizModel() as db:
+                id = str(uuid4())    # generate unique id
+                if db.create(id, title):
+                    flash(f"Quizzen {title} opprettet", category='success')
+                else:
+                    flash('Noe gikk galt', category='danger')
+        if form.errors:
+            for message in form.errors.values():
+                flash(message, category='error')
+        return render_template('quizForm.html', form=form)
+    else:
+        return redirect(url_for('views.home'))
