@@ -17,7 +17,9 @@ class UserModel:
 
     def get_user_by_id(self, id):
         try:
-            self.cursor.execute("SELECT * FROM User WHERE id=(%s)", (id,))
+            query = """SELECT id, firstname, lastname, email, password, role, created_at
+                       FROM User WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
             result = self.cursor.fetchone()
         except mysql.connector.Error as err:
                 print(err)

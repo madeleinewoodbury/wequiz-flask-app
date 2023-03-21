@@ -1,6 +1,6 @@
 from hashlib import new
 from flask import Blueprint, redirect, render_template, request, url_for, flash
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, current_user, logout_user
 from forms.LoginForm import LoginForm
 from forms.RegisterForm import RegisterForm
 from models.UserRole import UserRoleModel
@@ -84,9 +84,18 @@ def register():
 @views.route('/admin')
 @login_required
 def admin():
-    return render_template('admin.html')
+    if current_user.is_admin():
+        return render_template('admin.html', user=current_user)
+    else:
+        return redirect(url_for('views.home'))
 
 @views.route('/home')
 @login_required
 def home():
-    return render_template('home.html')
+    return render_template('home.html', user=current_user)
+
+@views.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('views.login'))

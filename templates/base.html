@@ -14,12 +14,11 @@
             <a href="/">Web Quiz</a>
         </h1>
         <ul>
+            {% if user and user.is_authenticated %}
             <li>
-                <a href="/">Link 1</a>
+                <a href={{url_for('views.logout')}}>Logg Ut</a>
             </li>
-            <li>
-                <a href="/">Link 2</a>
-            </li>
+            {% endif %}
         </ul>
     </nav>
 

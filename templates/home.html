@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-large text-primary">User Page</h2>
-<p>You have no rights...</p>
+<div class="dashboard">
+    {% if user %}
+    <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
+    <section>
+        <h3 class="text-primary">Dine Quizzer</h3>
+        <p>Du har ikke tatt noen quiz enda</p>
+    </section>
+    {% endif %}
+</div>
 {% endblock %}

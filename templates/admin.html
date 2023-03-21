@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-large text-primary">Admin Page</h2>
-<p>You have made it!</p>
+<div class="admin dashboard">
+    {% if user %}
+    <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
+    {% endif %}
+</div>
 {% endblock %}
