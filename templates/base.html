@@ -24,18 +24,21 @@
     </nav>
 
     <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="{{'alert alert-{}'.format(category)}}" role="role" id="flash-message">
-            <p>{{message}}</p>
-            <button type="button" class="close" onclick=removeFlash()>
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div id="alert-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="{{'alert alert-{}'.format(category)}}" role="role" id="flash-message">
+                <p>{{message}}</p>
+                <button type="button" class="close" onclick=removeFlash()>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
         </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+
 
         {% block content %}
         {% endblock %}
@@ -48,8 +51,8 @@
     }
 
     setTimeout(() => {
-        const flashMessage = document.getElementById('flash-message');
-        flashMessage.remove();
+        const alerts = document.getElementById('alert-container');
+        alerts.remove();
     }, "5000");
 </script>
 

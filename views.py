@@ -26,13 +26,14 @@ def login():
             user = User(*result)
             if user.check_password(password):
                 login_user(user, remember=True)
-                flash('Logged in successfully!', category='success')
                 if role.lower() == 'administrator':
                     if user.is_admin():
+                        flash('Logged in successfully!', category='success')
                         return redirect(url_for('views.admin'))
                     else:
                         flash('Not Authorized', category='error')
                 else:
+                    flash('Logged in successfully!', category='success')
                     return redirect(url_for('views.home'))
                 
             flash('Invalid credentials', category='error')
