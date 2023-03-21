@@ -25,8 +25,25 @@ class UserModel:
     
     def get_user_by_email(self, email):
         try:
-            self.cursor.execute("SELECT * FROM User WHERE email=(%s)", (email,))
+            query = """SELECT id, firstname, lastname, email, password, role, created_at
+                       FROM User WHERE email=(%s)"""
+            self.cursor.execute(query, (email,))
             result = self.cursor.fetchone()
         except mysql.connector.Error as err:
                 print(err)
         return result
+    
+    def create(self, user):
+         try:
+              query = """INSERT INTO User (id, firstname, lastname, email, password)
+                         VALUES (%s, %s, %s, %s, %s)"""
+              values = (user.id, 
+                        user.firstname,
+                        user.lastname,
+                        user.email,
+                        user.password)
+              self.cursor.execute(query, values)
+              return True
+         except mysql.connector.Error as err:
+              print(err)
+              return False

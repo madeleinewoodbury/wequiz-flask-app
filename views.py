@@ -1,9 +1,12 @@
+from hashlib import new
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_user, login_required
 from forms.LoginForm import LoginForm
+from forms.RegisterForm import RegisterForm
 from models.UserRole import UserRoleModel
 from models.User import UserModel
 from user import User
+from uuid import uuid4
 
 views = Blueprint('views', __name__)
 
@@ -15,7 +18,6 @@ def login():
         form.role.choices = result
 
     if form.validate_on_submit():
-        print('hey')
         role = form.role.data
         email = form.email.data
         password = form.password.data
@@ -39,7 +41,6 @@ def login():
             flash('Invalid credentials', category='error')
 
     if form.errors:
-        print(form.errors)
         for message in form.errors.values():
             flash(message, category='error')
         
@@ -47,11 +48,45 @@ def login():
     return render_template('login.html', form=form)
 
 
+@views.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        firstname = form.firstname.data
+        lastname = form.lastname.data
+        email = form.email.data
+        password = form.password.data
+        password2 = form.password2.data
+
+        if password != password2:
+            flash('Passord må være like', category='error')
+        else:
+            with UserModel() as db:
+                result = db.get_user_by_email(email)
+                if result:
+                    flash('Bruker allerede registrert med den epost adressen', category='error')
+                else:
+                    id = str(uuid4())    # generate unique id
+                    new_user = User(id, firstname, lastname, email)
+                    new_user.set_password(password)
+                    if db.create(new_user):
+                        flash('Ny bruker opprettet', category='success')
+                        return redirect(url_for('views.home'))
+                    else:
+                        flash('En feil oppstod', category='error')
+
+    if form.errors:
+        for message in form.errors.values():
+            flash(message, category='error')
+
+    return render_template('register.html', form=form)
+
 @views.route('/admin')
 @login_required
 def admin():
     return render_template('admin.html')
 
 @views.route('/home')
+@login_required
 def home():
     return render_template('home.html')

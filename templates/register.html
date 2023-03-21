@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-large text-primary">Registrer ny bruker</h2>
+<form method="POST" action={{url_for('views.register')}}>
+    {{form.hidden_tag()}}
+    <div class="form-group">
+        {{form.firstname.label}}
+        {{form.firstname}}
+    </div>
+    <div class="form-group">
+        {{form.lastname.label}}
+        {{form.lastname}}
+    </div>
+    <div class="form-group">
+        {{form.email.label}}
+        {{form.email}}
+    </div>
+    <div class="form-group">
+        {{form.password.label}}
+        {{form.password}}
+    </div>
+    <div class="form-group">
+        {{form.password2.label}}
+        {{form.password2}}
+    </div>
+    {{form.submit(class="btn btn-primary")}}
+</form>
+<p class="form-message">
+    Har du allerede en konto?
+    <a href={{url_for('views.login')}}>Logg inn her</a>
+</p>
+{% endblock %}

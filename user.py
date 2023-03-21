@@ -1,14 +1,14 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User():
-    def __init__(self, id, role, first_name, last_name, email, password, created_at):
+    def __init__(self, id, firstname, lastname, email, password=None, role=None, createdAt=None):
         self.id = id
-        self.role = role
-        self.first_name = first_name
-        self.last_name = last_name
+        self.firstname = firstname
+        self.lastname = lastname
         self.email = email
         self.password = password
-        self.created_at = created_at
+        self.role = role
+        self.createdAt = createdAt
         self.is_authenticated = True
         self.is_active = True
         self.is_anonymous = False
