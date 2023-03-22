@@ -26,3 +26,12 @@ class QuizModel:
             print(err)
             return False
         
+    def get_title(self, id):
+        try:
+            query = """SELECT title FROM Quiz WHERE id=(%s)"""
+            self.cursor.execute(query, id)
+            result = self.cursor.fetchone()
+            return result
+        except mysql.connector.Error as err:
+            print(err)
+        

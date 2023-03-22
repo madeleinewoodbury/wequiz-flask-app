@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS UserQuiz;
 DROP TABLE IF EXISTS Choice;
 DROP TABLE IF EXISTS Question;
 DROP TABLE IF EXISTS Quiz;
+DROP TABLE IF EXISTS QuizQuestion;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS Category;
 DROP TABLE IF EXISTS UserRole;
@@ -42,11 +43,19 @@ CREATE TABLE Quiz (
 
 CREATE TABLE Question (
     id VARCHAR(45) PRIMARY KEY,
-    quiz VARCHAR(45) NOT NULL,
+    -- quiz VARCHAR(45) NOT NULL,
     category VARCHAR(45),
     content VARCHAR(255),
     is_multiple_choice TINYINT DEFAULT 0,
-    FOREIGN KEY (quiz) REFERENCES Quiz(id)
+    FOREIGN KEY (category) REFERENCES Category(name)
+);
+
+CREATE TABLE QuizQuestion (
+    quiz VARCHAR(45) NOT NULL,
+    question VARCHAR(45) NOT NULL,
+    PRIMARY KEY (quiz, question),
+    FOREIGN KEY (quiz) REFERENCES Quiz(id),
+    FOREIGN KEY (question) REFERENCES Question(id)
 );
 
 CREATE TABLE Choice (

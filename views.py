@@ -3,6 +3,7 @@ from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user
 from forms.LoginForm import LoginForm
 from forms.QuizForm import QuizForm
+from forms.QuestionForm import QuestionForm
 from forms.RegisterForm import RegisterForm
 from models.UserRole import UserRoleModel
 from models.User import UserModel
@@ -113,11 +114,38 @@ def quiz():
                 id = str(uuid4())    # generate unique id
                 if db.create(id, title):
                     flash(f"Quizzen {title} opprettet", category='success')
+                    return redirect(url_for('views.question', quiz_id=id, title=title))
                 else:
                     flash('Noe gikk galt', category='danger')
         if form.errors:
             for message in form.errors.values():
                 flash(message, category='error')
         return render_template('quizForm.html', form=form)
+    else:
+        return redirect(url_for('views.home'))
+    
+@views.route('/question', methods=['GET', 'POST'])
+@login_required
+def question():
+    title = request.args['title']
+    if current_user.is_admin():
+        print(current_user)
+        form = QuestionForm()
+        if form.validate_on_submit():
+            return redirect(url_for('views.admin'))
+        else:
+            # print('id: ', form.quiz_id.data)
+            return render_template('questionForm.html', form=form, title=title)
+        #     title = form.title.data
+        #     with QuizModel() as db:
+        #         id = str(uuid4())    # generate unique id
+        #         if db.create(id, title):
+        #             flash(f"Quizzen {title} opprettet", category='success')
+        #         else:
+        #             flash('Noe gikk galt', category='danger')
+        # if form.errors:
+        #     for message in form.errors.values():
+        #         flash(message, category='error')
+        # return render_template('quizForm.html', form=form)
     else:
         return redirect(url_for('views.home'))

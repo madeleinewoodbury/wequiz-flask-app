@@ -159,7 +159,9 @@ ul {
 input[type='text'],
 input[type='email'],
 input[type='password'],
-select {
+input[type='number'],
+select,
+textarea {
   display: block;
   width: 100%;
   padding: 0.4rem;
@@ -167,8 +169,30 @@ select {
   border: 1px solid #ccc;
 }
 
+.check-form {
+  display: flex;
+  align-items: center;
+}
+
+input[type='checkbox'] {
+  border: 1px solid #ccc;
+  justify-self: flex-end;
+  cursor: pointer;
+  width: 17px;
+  height: 17px;
+  margin-left: 1rem;
+}
+
+textarea {
+  height: 100px;
+}
+
 .form-message {
   margin-top: 0.75rem;
+}
+
+.hidden {
+  display: none;
 }
 
 /* Dashboard */
