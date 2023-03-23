@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Length, NumberRange
 
 class QuestionForm(FlaskForm):
     category  = SelectField("Kategori", 
-                            choices=[("Alle", "Alle"), ("Databaser", "Databaser")], 
                            validators=[DataRequired()])
     content   = TextAreaField("Spørsmål", 
                                 validators=[DataRequired(),

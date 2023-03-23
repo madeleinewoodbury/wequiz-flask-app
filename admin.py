@@ -1,10 +1,10 @@
-from unicodedata import category
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
 from forms.QuizForm import QuizForm
 from forms.QuestionForm import QuestionForm
 from models.Quiz import QuizModel
 from models.Question import QuestionModel, Question, Choice
+from models.Category import CategoryModel
 from uuid import uuid4
 
 admin = Blueprint('admin', __name__)
@@ -47,6 +47,9 @@ def question():
     id = request.args['id']
     if current_user.is_admin():
         form = QuestionForm()
+        with CategoryModel() as db:
+            result = db.get_categories()
+            form.category.choices = result
         if form.validate_on_submit():
             category = form.category.data
             question_content = form.content.data
