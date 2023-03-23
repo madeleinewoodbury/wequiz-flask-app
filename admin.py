@@ -1,7 +1,9 @@
+from random import choices
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
 from forms.QuizForm import QuizForm
 from forms.QuestionForm import QuestionForm
+from forms.ChoiceForm import ChoiceForm
 from models.Quiz import QuizModel
 from models.Question import QuestionModel, Question, Choice
 from models.Category import CategoryModel
@@ -61,6 +63,8 @@ def question():
             with QuestionModel() as db:
                 if db.create(_question):
                     flash('Spørsmål lagt til', 'success')
+                    if form.choices.data > 0:
+                        return redirect(url_for('admin.choice', question_id=_question.id))
                 else:
                     flash('Noe gikk galt', category='danger')
 
@@ -68,5 +72,18 @@ def question():
 
         else:
             return render_template('questionForm.html', form=form, title=title, id=id)
+    else:
+        return redirect(url_for('views.home'))
+    
+@admin.route('/choice', methods=['GET', 'POST'])
+@login_required
+def choice():
+    if current_user.is_admin():
+        form = ChoiceForm()
+        if request.args['question_id']:
+            form.question_id = request.args['question_id']
+
+        print(form.question_id)
+        return render_template('choice.html', form=form)
     else:
         return redirect(url_for('views.home'))

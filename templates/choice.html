@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-large text-primary">Legg til svaralternativ</h2>
+<form method="POST" action={{url_for('admin.choice', question_id=question_id)}}>
+    {{form.hidden_tag()}}
+    <div class="form-group">
+        {{form.content.label}}
+        {{form.content}}
+    </div>
+    {{form.submit(class="btn btn-primary")}}
+</form>
+{% endblock %}
