@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2 class="text-large text-primary">Registrer ny bruker</h2>
-<form method="POST" action={{url_for('views.register')}}>
+<form method="POST" action={{url_for('auth.register')}}>
     {{form.hidden_tag()}}
     <div class="form-group">
         {{form.firstname.label}}
@@ -32,6 +32,6 @@
 </form>
 <p class="form-message">
     Har du allerede en konto?
-    <a href={{url_for('views.login')}}>Logg inn her</a>
+    <a href={{url_for('auth.login')}}>Logg inn her</a>
 </p>
 {% endblock %}

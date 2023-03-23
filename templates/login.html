@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2 class="text-large text-primary">Logg Inn</h2>
-<form method="POST" action={{url_for('views.login')}}>
+<form method="POST" action={{url_for('auth.login')}}>
     {{form.hidden_tag()}}
     <div class="form-group">
         {{form.role.label}}
@@ -19,6 +19,6 @@
 </form>
 <p class="form-message">
     Har du ikke opprettet en bruker?
-    <a href={{url_for('views.register')}}>Registrer deg her</a>
+    <a href={{url_for('auth.register')}}>Registrer deg her</a>
 </p>
 {% endblock %}

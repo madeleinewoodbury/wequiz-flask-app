@@ -17,11 +17,11 @@
             {% if user and user.is_authenticated %}
             {% if user.is_admin() %}
             <li>
-                <a href={{url_for('views.quiz')}}>Ny Quiz</a>
+                <a href={{url_for('admin.quiz')}}>Ny Quiz</a>
             </li>
             {% endif %}
             <li>
-                <a href={{url_for('views.logout')}}>Logg Ut</a>
+                <a href={{url_for('auth.logout')}}>Logg Ut</a>
             </li>
             {% endif %}
         </ul>

@@ -4,7 +4,7 @@
 {% if title %}
 <h3 class="lead">Quiz: {{title}}</h3>
 {% endif %}
-<form method="POST" action={{url_for('views.question')}}>
+<form method="POST" action={{url_for('admin.question', title=title, id=id)}}>
     {{form.hidden_tag()}}
     <div class="form-group">
         {{form.category.label}}
@@ -24,7 +24,7 @@
     </div>
     <div class="form-group hidden" id="choices">
         {{form.choices.label}}
-        {{form.choices}}
+        {{form.choices(value=0)}}
     </div>
     {{form.submit(class="btn btn-primary")}}
 </form>

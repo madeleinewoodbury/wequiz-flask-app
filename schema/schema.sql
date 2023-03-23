@@ -89,3 +89,16 @@ INSERT INTO User (id, role, firstname, lastname, email, password)
 VALUES
 ('ad341a5c-84f0-4617-abf2-5b7482a0e457', 'Administrator', 'John', 'Doe', 'jdoe@email.com', 'pbkdf2:sha256:260000$ZnX1SpCHcYEewgS5$35022d1d0b6490c07b3a6672cf86edb6291d35868115b10eeb3a795d31f3e0e6'),
 ('ba0a424e-8dc7-47e8-97e0-4824d812f4bf', 'Bruker', 'Kari', 'Olsen', 'kari@email.com', 'pbkdf2:sha256:260000$EciEAeMChVWpqVOC$740a34a2a271c7f93cc1ac3c0fc7584ab6458bde256648fd9b36746caace365f');
+
+
+-- SELECT
+--     Q.title,
+--     QT.category,
+--     QT.content AS question,
+--     QT.is_multiple_choice,
+--     A.content AS choice,
+--     A.is_correct
+-- FROM Quiz AS Q
+-- INNER JOIN QuizQuestion AS QQ ON Q.id = QQ.quiz
+-- INNER JOIN Question AS QT ON QQ.question = QT.id
+-- INNER JOIN Choice AS A ON QT.id = A.question;
