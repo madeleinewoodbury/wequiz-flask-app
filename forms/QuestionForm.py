@@ -1,8 +1,6 @@
-from email.policy import default
-from unicodedata import category
 from flask_wtf import FlaskForm
-from wtforms import SelectField, TextAreaField, SubmitField,BooleanField, IntegerField
-from wtforms.validators import DataRequired, Length, NumberRange
+from wtforms import SelectField, TextAreaField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, Length
 
 class QuestionForm(FlaskForm):
     category  = SelectField("Kategori", 
@@ -13,6 +11,4 @@ class QuestionForm(FlaskForm):
     is_multiple_choice  = BooleanField("Flervalgs spørsmål")
     answer    = TextAreaField("Riktig svar",
                              validators=[DataRequired()])
-    choices = IntegerField("Antall alternativer",
-                           validators=[NumberRange(min=0, max=10)])
     submit    = SubmitField("Lagre Spørsmål")

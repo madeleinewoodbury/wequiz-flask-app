@@ -17,7 +17,7 @@
             {% if user and user.is_authenticated %}
             {% if user.is_admin() %}
             <li>
-                <a href={{url_for('admin.quiz')}}>Ny Quiz</a>
+                <a href={{url_for('admin.create_quiz')}}>Ny Quiz</a>
             </li>
             {% endif %}
             <li>
@@ -58,11 +58,6 @@
         const alerts = document.getElementById('alert-container');
         alerts.remove();
     }, "5000");
-
-    function displayChoices() {
-        const choices = document.getElementById('choices')
-        choices.classList.remove('hidden')
-    }
 </script>
 
 </html>

@@ -1,6 +1,17 @@
 import mysql.connector
 from config import DB_CONFIG
 
+class Quiz():
+    def __init__(self, id, title, is_active, created_at):
+        self.id = id
+        self.title = title
+        self.is_active = is_active
+        self.created_at = created_at
+        self.questions = []
+    
+    def add_question(self, question):
+        self.questions.append(question)
+
 class QuizModel:
     def __init__(self):
         self.config = DB_CONFIG
@@ -26,12 +37,26 @@ class QuizModel:
             print(err)
             return False
         
-    def get_title(self, id):
+    def get_by_id(self, id):
         try:
-            query = """SELECT title FROM Quiz WHERE id=(%s)"""
-            self.cursor.execute(query, id)
+            query = """SELECT * FROM Quiz WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
             result = self.cursor.fetchone()
-            return result
+            quiz = Quiz(*result)
+            return quiz
         except mysql.connector.Error as err:
             print(err)
         
+    def get_questions(self, quiz):
+        try:
+            query = """SELECT question FROM QuizQuestion WHERE quiz=(%s)"""
+            self.cursor.execute(query, (id,))
+            result = self.cursor.fetchall()
+
+            for question in result:
+                quiz.add_question(question)
+
+            return quiz.questions
+        except mysql.connector.Error as err:
+            print*err
+    

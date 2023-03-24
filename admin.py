@@ -20,9 +20,9 @@ def home():
         return redirect(url_for('views.home'))
     
 
-@admin.route('/quiz', methods=['GET', 'POST'])
+@admin.route('/add-quiz', methods=['GET', 'POST'])
 @login_required
-def quiz():
+def create_quiz():
     if current_user.is_admin():
         form = QuizForm()
         if form.validate_on_submit():
@@ -31,7 +31,7 @@ def quiz():
                 id = str(uuid4())    # generate unique id
                 if db.create(id, title):
                     flash(f"Quizzen {title} opprettet", category='success')
-                    return redirect(url_for('admin.question', title=title, id=id))
+                    return redirect(url_for('admin.quiz', id=id))
                 else:
                     flash('Noe gikk galt', category='danger')
         if form.errors:
@@ -42,36 +42,38 @@ def quiz():
         return redirect(url_for('views.home'))
     
 
-@admin.route('/question', methods=['GET', 'POST'])
+@admin.route('/add-question', methods=['GET', 'POST'])
 @login_required
-def question():
-    title = request.args['title']
-    id = request.args['id']
+def create_question():
     if current_user.is_admin():
         form = QuestionForm()
+        quiz_id = request.args['quiz_id']
+        
         with CategoryModel() as db:
             result = db.get_categories()
             form.category.choices = result
+
         if form.validate_on_submit():
             category = form.category.data
-            question_content = form.content.data
-            answer_content = form.answer.data
+            content = form.content.data
+            answer = form.answer.data
             is_multiple_choice = int(form.is_multiple_choice.data)
-            _question = Question(category, question_content, is_multiple_choice, id)
-            _question.add_choice(answer_content, is_correct=True)
+            question = Question(category, content, is_multiple_choice, quiz_id)
+            question.add_choice(answer, is_correct=True)
+
 
             with QuestionModel() as db:
-                if db.create(_question):
+                if db.create(question):
                     flash('Spørsmål lagt til', 'success')
-                    if form.choices.data > 0:
-                        return redirect(url_for('admin.choice', question_id=_question.id))
+                    if is_multiple_choice:
+                        return redirect(url_for('admin.choice', question_id=question.id))
                 else:
                     flash('Noe gikk galt', category='danger')
 
-            return redirect(url_for('views.home'))
+            return redirect(url_for('admin.quiz', id=quiz_id))
 
         else:
-            return render_template('questionForm.html', form=form, title=title, id=id)
+            return render_template('questionForm.html', form=form, quiz_id=quiz_id)
     else:
         return redirect(url_for('views.home'))
     
@@ -83,7 +85,21 @@ def choice():
         if request.args['question_id']:
             form.question_id = request.args['question_id']
 
-        print(form.question_id)
         return render_template('choice.html', form=form)
+    else:
+        return redirect(url_for('views.home'))
+
+
+@admin.route('/quiz', methods=['GET'])
+@login_required
+def quiz():
+    if current_user.is_admin():
+        id = request.args['id']
+
+        with QuizModel() as db:
+            quiz = db.get_by_id(id)
+            questions = db.get_questions(quiz)
+        
+        return render_template('quiz.html', quiz=quiz, questions=questions)
     else:
         return redirect(url_for('views.home'))
