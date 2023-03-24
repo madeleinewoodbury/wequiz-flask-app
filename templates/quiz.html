@@ -10,9 +10,28 @@
     </div>
     {% if questions %}
     <div class="question">
-        {% for question in questions %}
-        <p>{{question.content}}</p>
-        {% endfor %}
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Category</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                <tr>
+                    <td>{{q.content}}</td>
+                    <td class='hide-sm'>{{q.category}}</td>
+                    <td>
+                        <a href="#" class="btn btn-light">Rediger</a>
+                        <a href="#" class="btn btn-danger">Slett</a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
         {% endif %}
     </div>
 </div>

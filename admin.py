@@ -1,4 +1,3 @@
-from random import choices
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
 from forms.QuizForm import QuizForm
@@ -100,15 +99,20 @@ def quiz():
 
         with QuizModel() as db:
             quiz = db.get_by_id(id)
-            db.get_questions(quiz)
+            if quiz:
+                db.get_questions(quiz)
+            else:
+                return redirect(url_for('views.home'))
 
         with QuestionModel() as db:
             questions = []
             for question_id in quiz.questions:
                 question = db.get_by_id(question_id)
-                questions.append(Question(*question))
-
-
+                question = Question(*question)
+                if len(question.content) > 45:
+                    question.content = question.content[:45] + '...' 
+                questions.append(question)
+                
         return render_template('quiz.html', quiz=quiz, questions=questions)
     else:
         return redirect(url_for('views.home'))

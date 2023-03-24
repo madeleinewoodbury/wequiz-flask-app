@@ -82,6 +82,20 @@ ul {
   color: #fff;
 }
 
+.btn-secondary {
+  background-color: var(--light-color);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: #fff;
+}
+
 /* Navbar */
 
 .navbar {
@@ -199,6 +213,21 @@ textarea {
 .dashboard {
   display: flex;
   flex-direction: column;
+}
+
+.table {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: left;
+}
+
+.table th {
+  background: var(--light-color);
 }
 
 @media (max-width: 700px) {
