@@ -12,6 +12,10 @@ class Quiz():
     def add_question(self, question):
         self.questions.append(question)
 
+    def __str__(self):
+        return f"id: {self.id}\ntitle: {self.title}"
+
+
 class QuizModel:
     def __init__(self):
         self.config = DB_CONFIG
@@ -50,13 +54,12 @@ class QuizModel:
     def get_questions(self, quiz):
         try:
             query = """SELECT question FROM QuizQuestion WHERE quiz=(%s)"""
-            self.cursor.execute(query, (id,))
+            self.cursor.execute(query, (quiz.id,))
             result = self.cursor.fetchall()
-
             for question in result:
-                quiz.add_question(question)
+                quiz.add_question(question[0])
 
-            return quiz.questions
+            return True
         except mysql.connector.Error as err:
-            print*err
+            print(err)
     

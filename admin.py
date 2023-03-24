@@ -54,13 +54,15 @@ def create_question():
             form.category.choices = result
 
         if form.validate_on_submit():
+            id = str(uuid4())
             category = form.category.data
             content = form.content.data
             answer = form.answer.data
             is_multiple_choice = int(form.is_multiple_choice.data)
-            question = Question(category, content, is_multiple_choice, quiz_id)
+            # question = Question(category, content, is_multiple_choice, quiz_id)
+            question = Question(id, category, content, is_multiple_choice)
+            question.quiz = quiz_id
             question.add_choice(answer, is_correct=True)
-
 
             with QuestionModel() as db:
                 if db.create(question):
@@ -98,8 +100,15 @@ def quiz():
 
         with QuizModel() as db:
             quiz = db.get_by_id(id)
-            questions = db.get_questions(quiz)
-        
+            db.get_questions(quiz)
+
+        with QuestionModel() as db:
+            questions = []
+            for question_id in quiz.questions:
+                question = db.get_by_id(question_id)
+                questions.append(Question(*question))
+
+
         return render_template('quiz.html', quiz=quiz, questions=questions)
     else:
         return redirect(url_for('views.home'))
