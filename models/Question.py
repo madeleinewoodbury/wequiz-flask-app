@@ -19,8 +19,7 @@ class Question():
         self.choices = []
         self.quiz = None
 
-    def add_choice(self, content, is_correct):
-        id = str(uuid4())
+    def add_choice(self, id, content, is_correct):
         self.choices.append(Choice(id, self.id, content, is_correct))
 
 
@@ -85,6 +84,26 @@ class QuestionModel:
             query = """SELECT * FROM Question WHERE id=(%s)"""
             self.cursor.execute(query, (id,))
             result = self.cursor.fetchone()
+            return result
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_answer(self, id):
+        try:
+            query = """SELECT content FROM Choice 
+                    WHERE question=(%s) AND is_correct = 1"""
+            self.cursor.execute(query, (id,))
+            result = self.cursor.fetchone()
+            return result[0]
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_choices(self, id):
+        try:
+            query = """SELECT id, content FROM Choice 
+                    WHERE question=(%s) AND NOT is_correct"""
+            self.cursor.execute(query, (id,))
+            result = self.cursor.fetchall()
             return result
         except mysql.connector.Error as err:
             print(err)
