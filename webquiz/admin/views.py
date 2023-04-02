@@ -13,7 +13,13 @@ admin = Blueprint('admin', __name__, template_folder='templates')
 @login_required
 def home():
     if current_user.is_admin():
-        return render_template('admin.html', user=current_user)
+        with QuizTable() as db:
+            result = db.get_all()
+            quizzes = []
+            for quiz in result:
+                quizzes.append(Quiz(*quiz))
+
+        return render_template('admin.html', user=current_user, quizzes=quizzes)
     else:
         return redirect(url_for('main.home'))
     
@@ -83,6 +89,7 @@ def choice():
     if current_user.is_admin():
         form = ChoiceForm()
         question_id = request.args['id']
+        print('bah', question_id)
 
         if form.validate_on_submit():
             id = str(uuid4())
@@ -92,7 +99,7 @@ def choice():
             with QuestionTable() as db:
                 if db.create_choice(new_choice):
                     flash('Svaralternativ opprettet', 'success')
-                    return redirect(url_for('question', id=question_id))
+                    return redirect(url_for('admin.question', id=question_id))
 
         return render_template('choice.html', form=form, id=question_id)
     else:

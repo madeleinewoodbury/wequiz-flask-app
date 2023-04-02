@@ -40,6 +40,15 @@ class QuizTable(Database):
             return quiz
         except mysql.connector.Error as err:
             print(err)
+    
+    def get_all(self):
+        try:
+            query = """SELECT * FROM Quiz"""
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            print(err)
         
     def get_questions(self, quiz):
         try:

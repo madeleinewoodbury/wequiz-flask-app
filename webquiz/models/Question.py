@@ -43,16 +43,21 @@ class QuestionTable(Database):
             return False
 
     def create_choice(self, choice):
-        id = choice.id
-        question = choice.question
-        content = choice.content
-        is_correct = choice.is_correct
+        try:
+            id = choice.id
+            question = choice.question
+            content = choice.content
+            is_correct = choice.is_correct
 
-        query = """INSERT INTO Choice (id, question, content, is_correct)
-                    VALUES (%s, %s, %s, %s)"""
-        values = (id, question, content, is_correct)
-        self.cursor.execute(query, values)
-
+            query = """INSERT INTO Choice (id, question, content, is_correct)
+                        VALUES (%s, %s, %s, %s)"""
+            values = (id, question, content, is_correct)
+            self.cursor.execute(query, values)
+            return True
+        except mysql.connector.Error as err:
+            print(err)
+            return False
+        
     def create_quizQuestion(self, quiz_id, question_id):
         query = """INSERT INTO QuizQuestion (quiz, question)
                     VALUES (%s, %s)"""

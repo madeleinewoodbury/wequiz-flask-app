@@ -4,5 +4,36 @@
     {% if user %}
     <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
     {% endif %}
-</div>
-{% endblock %}
+    {% if quizzes %}
+    <div class="question">
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Quiz</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in quizzes %}
+                <tr>
+                    <td>{{q.title}}</td>
+                    <td>
+                        {% if q.is_active%}
+                        Aktiv
+                        {% else %}
+                        Ikke aktiv
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href={{url_for('admin.quiz', id=q.id)}} class="btn btn-light">Rediger</a>
+                        <a href="#" class="btn btn-danger">Slett</a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    {% endblock %}
