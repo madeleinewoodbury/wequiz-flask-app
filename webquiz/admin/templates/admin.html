@@ -4,36 +4,42 @@
     {% if user %}
     <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
     {% endif %}
-    {% if quizzes %}
-    <div class="question">
-        <table class='table'>
-            <thead>
-                <tr>
-                    <th>Quiz</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in quizzes %}
-                <tr>
-                    <td>{{q.title}}</td>
-                    <td>
-                        {% if q.is_active%}
-                        Aktiv
-                        {% else %}
-                        Ikke aktiv
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href={{url_for('admin.quiz', id=q.id)}} class="btn btn-light">Rediger</a>
-                        <a href="#" class="btn btn-danger">Slett</a>
-                    </td>
-                </tr>
-                {% endfor %}
+    <section>
+        <h3 class="text-primary">Quizzer</h3>
+        {% if quizzes %}
+        <div class="question">
+            <table class='table'>
+                <thead>
+                    <tr>
+                        <th>Quiz</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in quizzes %}
+                    <tr>
+                        <td>{{q.title}}</td>
+                        <td>
+                            {% if q.is_active%}
+                            Aktiv
+                            {% else %}
+                            Ikke aktiv
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href={{url_for('admin.quiz', id=q.id)}} class="btn btn-light">Rediger</a>
+                            <a href="#" class="btn btn-danger">Slett</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
 
-            </tbody>
-        </table>
-        {% endif %}
-    </div>
-    {% endblock %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Ingen quizzer i databasen</p>
+            {% endif %}
+    </section>
+
+</div>
+{% endblock %}

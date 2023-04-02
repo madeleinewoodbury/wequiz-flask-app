@@ -53,8 +53,8 @@ CREATE TABLE QuizQuestion (
     quiz VARCHAR(45) NOT NULL,
     question VARCHAR(45) NOT NULL,
     PRIMARY KEY (quiz, question),
-    FOREIGN KEY (quiz) REFERENCES Quiz(id),
-    FOREIGN KEY (question) REFERENCES Question(id)
+    FOREIGN KEY (quiz) REFERENCES Quiz(id) ON DELETE CASCADE,
+    FOREIGN KEY (question) REFERENCES Question(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Choice (
@@ -62,7 +62,7 @@ CREATE TABLE Choice (
     question VARCHAR(45) NOT NULL,
     content VARCHAR(255),
     is_correct TINYINT,
-    FOREIGN KEY (question) REFERENCES Question(id)
+    FOREIGN KEY (question) REFERENCES Question(id) ON DELETE CASCADE
 );
 
 CREATE TABLE UserQuiz (

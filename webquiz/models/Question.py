@@ -92,3 +92,13 @@ class QuestionTable(Database):
             return result
         except mysql.connector.Error as err:
             print(err)
+
+    def delete(self, id):
+        try:
+            query = """DELETE FROM Question
+                    WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
+            return True
+        except mysql.connector.Error as err:
+            print(err)
+            return False
