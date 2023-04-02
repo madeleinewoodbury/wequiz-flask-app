@@ -1,20 +1,46 @@
+from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
-from config import DB_CONFIG
+from config import Database
 
-class UserModel:
+class User:
+    def __init__(self, id, firstname, lastname, email, password=None, role=None, createdAt=None):
+        self.id = id
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email = email
+        self.password = password
+        self.role = role
+        self.createdAt = createdAt
+        self.is_authenticated = True
+        self.is_active = True
+        self.is_anonymous = False
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+    
+    def is_admin(self):
+        return self.role.lower() == 'administrator'
+                
+    def get_id(self):
+        return self.id      # string value
+    
+    def is_authenticated(self):
+        return self.is_authenticated
+    
+    def is_active(self):
+        return self.is_active
+    
+    def is_anonymous(self):
+        return self.is_anonymous
+
+
+class UserTable(Database):
     def __init__(self):
-        self.config = DB_CONFIG
+        super().__init__()
     
-    def __enter__(self):
-        self.conn = mysql.connector.connect(**self.config)
-        self.cursor = self.conn.cursor(prepared=True)
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_trace):
-        self.conn.commit()
-        self.cursor.close()
-        self.conn.close()
-
     def get_user_by_id(self, id):
         try:
             query = """SELECT id, firstname, lastname, email, password, role, created_at

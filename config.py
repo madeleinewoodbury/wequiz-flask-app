@@ -1,3 +1,4 @@
+import mysql.connector
 from dotenv import load_dotenv
 import os
 
@@ -12,3 +13,16 @@ DB_CONFIG = {
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+class Database:
+    def __init__(self):
+        self.config = DB_CONFIG
+    
+    def __enter__(self):
+        self.conn = mysql.connector.connect(**self.config)
+        self.cursor = self.conn.cursor(prepared=True)
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_trace):
+        self.conn.commit()
+        self.cursor.close()
+        self.conn.close()

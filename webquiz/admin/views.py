@@ -1,15 +1,13 @@
-from unittest import result
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
-from forms.QuizForm import QuizForm
-from forms.QuestionForm import QuestionForm
-from forms.ChoiceForm import ChoiceForm
-from models.Quiz import QuizModel
-from models.Question import QuestionModel, Question, Choice
-from models.Category import CategoryModel
+from webquiz.admin.forms import QuizForm, QuestionForm, ChoiceForm
+from webquiz.models.Quiz import Quiz, QuizTable
+from webquiz.models.Question import Question, QuestionTable
+from webquiz.models.Category import CategoryTable
+from webquiz.models.Choice import Choice
 from uuid import uuid4
 
-admin = Blueprint('admin', __name__)
+admin = Blueprint('admin', __name__, template_folder='templates')
 
 @admin.route('/')
 @login_required
@@ -17,7 +15,7 @@ def home():
     if current_user.is_admin():
         return render_template('admin.html', user=current_user)
     else:
-        return redirect(url_for('views.home'))
+        return redirect(url_for('main.home'))
     
 
 @admin.route('/add-quiz', methods=['GET', 'POST'])
@@ -27,7 +25,7 @@ def create_quiz():
         form = QuizForm()
         if form.validate_on_submit():
             title = form.title.data
-            with QuizModel() as db:
+            with QuizTable() as db:
                 id = str(uuid4())    # generate unique id
                 if db.create(id, title):
                     flash(f"Quizzen {title} opprettet", category='success')
@@ -39,7 +37,7 @@ def create_quiz():
                 flash(message, category='error')
         return render_template('quizForm.html', form=form)
     else:
-        return redirect(url_for('views.home'))
+        return redirect(url_for('main.home'))
     
 
 @admin.route('/add-question', methods=['GET', 'POST'])
@@ -49,7 +47,7 @@ def create_question():
         form = QuestionForm()
         quiz_id = request.args['quiz_id']
         
-        with CategoryModel() as db:
+        with CategoryTable() as db:
             result = db.get_categories()
             form.category.choices = result
 
@@ -64,7 +62,7 @@ def create_question():
             choice_id = str(uuid4())
             question.add_choice(choice_id, answer, is_correct=True)
 
-            with QuestionModel() as db:
+            with QuestionTable() as db:
                 if db.create(question):
                     flash('Spørsmål lagt til', 'success')
                     if is_multiple_choice:
@@ -77,7 +75,7 @@ def create_question():
         else:
             return render_template('questionForm.html', form=form, quiz_id=quiz_id)
     else:
-        return redirect(url_for('views.home'))
+        return redirect(url_for('main.home'))
     
 @admin.route('/choice', methods=['GET', 'POST'])
 @login_required
@@ -91,14 +89,14 @@ def choice():
             content = form.content.data
             new_choice = Choice(id, question_id, content, False)
 
-            with QuestionModel() as db:
+            with QuestionTable() as db:
                 if db.create_choice(new_choice):
                     flash('Svaralternativ opprettet', 'success')
                     return redirect(url_for('question', id=question_id))
 
         return render_template('choice.html', form=form, id=question_id)
     else:
-        return redirect(url_for('views.home'))
+        return redirect(url_for('main.home'))
 
 
 @admin.route('/quiz', methods=['GET'])
@@ -107,14 +105,14 @@ def quiz():
     if current_user.is_admin():
         id = request.args['id']
 
-        with QuizModel() as db:
+        with QuizTable() as db:
             quiz = db.get_by_id(id)
             if quiz:
                 db.get_questions(quiz)
             else:
-                return redirect(url_for('views.home'))
+                return redirect(url_for('main.home'))
 
-        with QuestionModel() as db:
+        with QuestionTable() as db:
             questions = []
             for question_id in quiz.questions:
                 question = db.get_by_id(question_id)
@@ -125,7 +123,7 @@ def quiz():
                 
         return render_template('quiz.html', quiz=quiz, questions=questions)
     else:
-        return redirect(url_for('views.home'))
+        return redirect(url_for('main.home'))
     
 
 @admin.route('/question', methods=['GET'])
@@ -134,7 +132,7 @@ def question():
     if current_user.is_admin():
         id = request.args['id']
 
-        with QuestionModel() as db:
+        with QuestionTable() as db:
             result = db.get_by_id(id)
             question = Question(*result)
             question.answer = db.get_answer(id)
@@ -147,4 +145,4 @@ def question():
             return render_template('questionAdmin.html', question=question)
 
     else:
-        return redirect(url_for('views.home'))
+        return redirect(url_for('main.home'))

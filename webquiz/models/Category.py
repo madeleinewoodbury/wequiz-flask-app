@@ -1,9 +1,9 @@
 import mysql.connector
-from config import DB_CONFIG
+from config import Database
 
-class CategoryModel:
+class CategoryTable(Database):
     def __init__(self):
-        self.config = DB_CONFIG
+        super().__init__()
     
     def __enter__(self):
         self.conn = mysql.connector.connect(**self.config)

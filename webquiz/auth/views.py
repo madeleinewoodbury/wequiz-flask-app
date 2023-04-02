@@ -1,18 +1,16 @@
 from flask import Blueprint, redirect, render_template, url_for, flash
 from flask_login import login_user, login_required, logout_user
-from forms.LoginForm import LoginForm
-from forms.RegisterForm import RegisterForm
-from models.User import UserModel
-from models.UserRole import UserRoleModel
-from user import User
+from webquiz.auth.forms import LoginForm, RegisterForm
+from webquiz.models.User import User, UserTable
+from webquiz.models.Role import RoleTable
 from uuid import uuid4
 
-auth = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__, template_folder='templates')
 
 @auth.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    with UserRoleModel() as db:
+    with RoleTable() as db:
         result = db.get_choices()
         form.role.choices = result
 
@@ -21,7 +19,7 @@ def login():
         email = form.email.data
         password = form.password.data
 
-        with UserModel() as db:
+        with UserTable() as db:
             result = db.get_user_by_email(email)
         if result:
             user = User(*result)
@@ -30,12 +28,12 @@ def login():
                 if role.lower() == 'administrator':
                     if user.is_admin():
                         flash('Logged in successfully!', category='success')
-                        return redirect(url_for('views.home'))
+                        return redirect(url_for('main.home'))
                     else:
                         flash('Not Authorized', category='error')
                 else:
                     flash('Logged in successfully!', category='success')
-                    return redirect(url_for('views.home'))
+                    return redirect(url_for('main.home'))
                 
             flash('Invalid credentials', category='error')
 
@@ -60,7 +58,7 @@ def register():
         if password != password2:
             flash('Passord må være like', category='error')
         else:
-            with UserModel() as db:
+            with UserTable() as db:
                 result = db.get_user_by_email(email)
                 if result:
                     flash('Bruker allerede registrert med den epost adressen', category='error')
@@ -71,7 +69,7 @@ def register():
                     if db.create(new_user):
                         flash('Ny bruker opprettet', category='success')
                         login_user(new_user, remember=True)
-                        return redirect(url_for('views.home'))
+                        return redirect(url_for('main.home'))
                     else:
                         flash('En feil oppstod', category='error')
 

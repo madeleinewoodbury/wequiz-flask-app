@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, PasswordField, SubmitField
+from wtforms import StringField, EmailField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email, Length
 
 class RegisterForm(FlaskForm):
@@ -20,3 +20,14 @@ class RegisterForm(FlaskForm):
                               validators=[DataRequired("Fyll inn gjenta passord"), 
                                           Length(min=8, max=32)])
     submit    = SubmitField("Opprett bruker")
+
+
+class LoginForm(FlaskForm):
+    role     = SelectField("Logg inn som", 
+                           validators=[DataRequired()])
+    email    = EmailField("Epost", 
+                          validators=[DataRequired("Fyll inn epost"), 
+                                      Email()])
+    password = PasswordField("Passord", 
+                             validators=[DataRequired("Fyll inn passord")])
+    submit   = SubmitField("Logg inn")

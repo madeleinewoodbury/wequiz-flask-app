@@ -1,7 +1,7 @@
 import mysql.connector
-from config import DB_CONFIG
+from config import Database
 
-class Quiz():
+class Quiz:
     def __init__(self, id, title, is_active, created_at):
         self.id = id
         self.title = title
@@ -14,21 +14,11 @@ class Quiz():
 
     def __str__(self):
         return f"id: {self.id}\ntitle: {self.title}"
+    
 
-
-class QuizModel:
+class QuizTable(Database):
     def __init__(self):
-        self.config = DB_CONFIG
-    
-    def __enter__(self):
-        self.conn = mysql.connector.connect(**self.config)
-        self.cursor = self.conn.cursor(prepared=True)
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_trace):
-        self.conn.commit()
-        self.cursor.close()
-        self.conn.close()
+        super().__init__()
     
     def create(self, id, title):
         try:

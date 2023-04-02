@@ -1,16 +1,8 @@
 import mysql.connector
-from config import DB_CONFIG
-from uuid import uuid4
+from config import Database
+from webquiz.models.Choice import Choice
 
-class Choice():
-    def __init__(self, id, question, content, is_correct):
-        self.id = id
-        self.question = question
-        self.content = content
-        self.is_correct = int(is_correct)
-
-
-class Question():
+class Question:
     def __init__(self, id, category, content, is_multiple_choice):
         self.id = id
         self.category = category
@@ -22,20 +14,9 @@ class Question():
     def add_choice(self, id, content, is_correct):
         self.choices.append(Choice(id, self.id, content, is_correct))
 
-
-class QuestionModel:
+class QuestionTable(Database):
     def __init__(self):
-        self.config = DB_CONFIG
-    
-    def __enter__(self):
-        self.conn = mysql.connector.connect(**self.config)
-        self.cursor = self.conn.cursor(prepared=True)
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_trace):
-        self.conn.commit()
-        self.cursor.close()
-        self.conn.close()
+        super().__init__()
     
     def create(self, question):
         try:
@@ -60,7 +41,6 @@ class QuestionModel:
         except mysql.connector.Error as err:
             print(err)
             return False
-
 
     def create_choice(self, choice):
         id = choice.id
