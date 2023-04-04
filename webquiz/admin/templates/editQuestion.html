@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-large text-primary">Nytt Spørsmål</h2>
+<h2 class="text-large text-primary">Rediger Spørsmål</h2>
 {% if title %}
 <h3 class="lead">Quiz: {{title}}</h3>
 {% endif %}
-<form method="POST" action={{url_for('admin.create_question', quiz_id=quiz_id)}}>
+<form method="POST" action={{url_for('admin.update_question', id=form.id.data, quiz=quiz)}}>
     {{form.hidden_tag()}}
     <div class="form-group">
         {{form.category.label}}
@@ -22,12 +22,22 @@
         {{form.is_multiple_choice.label}}
         {{form.is_multiple_choice}}
     </div>
-    <div id="choices" class="hidden">
+    {% if form.is_multiple_choice.data%}
+    <div id='choices'>
         {% for choice in form.choices%}
         {{choice.content.label}}
         {{choice.content}}
         {% endfor %}
     </div>
+    {% else %}
+    <div id='choices' class="hidden">
+        {% for choice in form.choices%}
+        {{choice.content.label}}
+        {{choice.content}}
+        {% endfor %}
+    </div>
+    {% endif%}
+
     {{form.submit(class="btn btn-primary")}}
 </form>
 {% endblock %}

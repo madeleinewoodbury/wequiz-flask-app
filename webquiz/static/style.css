@@ -230,6 +230,27 @@ textarea {
   background: var(--light-color);
 }
 
+/* Question */
+.question {
+  position: relative;
+}
+
+.question .btn-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.question p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.question .choices li {
+  display: flex;
+  justify-content: space-between;
+}
+
 @media (max-width: 700px) {
   .container {
     margin-top: 8rem;

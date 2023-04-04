@@ -24,7 +24,8 @@
                     <td>{{q.content}}</td>
                     <td class='hide-sm'>{{q.category}}</td>
                     <td>
-                        <a href="#" class="btn btn-light">Rediger</a>
+                        <a href={{url_for('admin.update_question', quiz=quiz.id, id=q.id)}}
+                            class="btn btn-light">Rediger</a>
                         <a href={{url_for('admin.delete_question', quiz=quiz.id, id=q.id)}}
                             class="btn btn-danger">Slett</a>
                     </td>

@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, render_template, url_for, flash
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from webquiz.auth.forms import LoginForm, RegisterForm
 from webquiz.models.User import User, UserTable
 from webquiz.models.Role import RoleTable
