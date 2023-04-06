@@ -4,8 +4,31 @@
     {% if user %}
     <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
     <section>
-        <h3 class="text-primary">Dine Quizzer</h3>
-        <p>Du har ikke tatt noen quiz enda</p>
+        <h3 class="text-primary">Quizzer</h3>
+        {% if quizzes %}
+        <div class="question">
+            <table class='table'>
+                <thead>
+                    <tr>
+                        <th>Quiz</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in quizzes %}
+                    <tr>
+                        <td>{{q.title}}</td>
+                        <td>
+                            <a href={{url_for('main.quiz', id=q.id)}} class="btn btn-light">Ta Quiz</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            {% else %}
+            <p>Ingen quizzer i databasen</p>
+            {% endif %}
     </section>
     {% endif %}
 </div>

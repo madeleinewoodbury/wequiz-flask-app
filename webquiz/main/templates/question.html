@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-large text-primary">Spørsmål {{current}}</h2>
+<form method="POST" action={{url_for('main.quiz_question', id=id, quiz=quiz_id, multiple_choice=multiple_choice,
+    current=current)}}>
+    {{form.hidden_tag()}}
+    <p>{{question}}</p>
+    <div class="form-group">
+        {{form.answer}}
+    </div>
+    {{form.submit(class="btn btn-primary")}}
+</form>
+{% endblock %}

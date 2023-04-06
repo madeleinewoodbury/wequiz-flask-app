@@ -58,7 +58,7 @@ def quiz():
             if quiz:
                 db.get_questions(quiz)
             else:
-                return redirect(url_for('main.home'))
+                return redirect(url_for('admin.home'))
 
         with QuestionTable() as db:
             questions = []
@@ -67,8 +67,8 @@ def quiz():
                 if len(question.content) > 45:
                     question.content = question.content[:45] + '...' 
                 questions.append(question)
-                
-        return render_template('quiz.html', quiz=quiz, questions=questions)
+        
+        return render_template('adminQuiz.html', quiz=quiz, questions=questions)
     else:
         return redirect(url_for('main.home'))
 
@@ -170,7 +170,8 @@ def update_question():
                     db.delete_alternatives(question.id)
 
             flash('Spørsmål oppdatert', 'success')
-            return redirect(url_for('admin.quiz'), id=quiz_id)
+            print(quiz_id)
+            return redirect(url_for('admin.quiz', id=quiz_id))
 
         form.id.data = question.id
         form.category.data = question.category

@@ -21,6 +21,13 @@ class Question:
     def add_choice(self, id, content):
         self.choices.append(Choice(id, self.id, content, False))
 
+    def display(self):
+        print(f"Category: {self.category}, Multiplie choice: {'yes' if self.is_multiple_choice else 'no'}")
+        print(f"Question: {self.content}")
+        print(f"Choices: ")
+        for choice in self.choices:
+            print(choice.content, choice.is_correct)
+
 
 class QuestionTable(Database):
     def __init__(self):
