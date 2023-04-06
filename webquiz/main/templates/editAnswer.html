@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-large text-primary">Spørsmål {{current}}</h2>
+<form method="POST" action={{url_for('main.edit_answer', quiz_id=quiz_id, question_id=question.id)}}>
+    {{form.hidden_tag()}}
+    <p>{{question.content}}</p>
+    <div class="form-group">
+        {{form.answer}}
+    </div>
+    {{form.submit(class="btn btn-primary")}}
+</form>
+{% endblock %}

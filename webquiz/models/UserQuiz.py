@@ -9,6 +9,7 @@ class Answer:
         self.question = question
         self.content = content
         self.question_content = None
+        self.is_correct = False
 
 class UserQuiz:
     def __init__(self, id, quiz, user, date_taken=None):
@@ -18,6 +19,7 @@ class UserQuiz:
         self.date_taken = date_taken
         self.answers = []
         self.questions = []
+        self.results = []
         self.current = 0
     
     def add_answer(self, answer):
@@ -25,6 +27,9 @@ class UserQuiz:
 
     def add_question(self, question):
         self.questions.append(question)
+
+    def add_results(self, results):
+        pass
     
 
 class UserQuizTable(Database):
@@ -90,7 +95,25 @@ class UserQuizTable(Database):
             return result
         except mysql.connector.Error as err:
             print(err)
-        
+
+    def get_user_answer(self, quiz_id, question_id):
+        try:
+            query = """SELECT content FROM Answer WHERE user_quiz=(%s) AND question=(%s)"""
+            self.cursor.execute(query, (quiz_id, question_id))
+            result = self.cursor.fetchone()
+            answer = Answer(quiz_id, question_id, content=result[0])
+            return answer
+        except mysql.connector.Error as err:
+            print(err)
+
+    def update_answer(self, quiz_id, question_id, new_content):
+        try:
+            query = """UPDATE Answer SET content=(%s) WHERE user_quiz=(%s) AND question=(%s)"""
+            self.cursor.execute(query, (new_content, quiz_id, question_id))
+            return True
+        except mysql.connector.Error as err:
+            print(err)
+
     def get_answers(self, user_quiz):
         try:
             query = """SELECT * FROM Answer WHERE user_quiz=(%s)"""
@@ -122,4 +145,24 @@ class UserQuizTable(Database):
                 with QuestionTable() as db:
                     question = db.get_question(answer.question)
                     answer.question_content = question.content
+
+    def check_answers(self, quiz):
+        try:
+            query = """SELECT Q.id, Q.content, A.content,
+                       (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
+                        FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
+                        WHERE A.user_quiz=(%s)"""
             
+            self.cursor.execute(query, (quiz.id,))
+            result = self.cursor.fetchall()
+            for item in result:
+                question_id, question, user_answer, correct_answer = item
+                answer = Answer(quiz.id, question_id, user_answer)
+                answer.question_content = question
+                if user_answer == correct_answer:
+                    answer.is_correct = True
+
+                quiz.add_answer(answer)    
+
+        except mysql.connector.Error as err:
+            print(err)

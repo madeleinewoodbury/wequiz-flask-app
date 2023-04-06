@@ -19,7 +19,15 @@
                     <tr>
                         <td>{{q.title}}</td>
                         <td>
-                            <a href={{url_for('main.quiz', id=q.id)}} class="btn btn-light">Ta Quiz</a>
+                            {% if q.id in user_quizzes %}
+                            {% if user_quizzes[q.id] < 3 %} <a href={{url_for('main.quiz', id=q.id)}}
+                                class="btn btn-primary">Ta Quiz</a>
+                                {% else %}
+                                Bah
+                                {% endif %}
+                                {% else %}
+                                <a href={{url_for('main.quiz', id=q.id)}} class="btn btn-primary">Ta Quiz</a>
+                                {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

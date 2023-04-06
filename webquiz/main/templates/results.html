@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="quiz">
+    {% if quiz %}
+    <h2 class="text-large text-primary">Dine Resultater</h2>
+    {% for answer in quiz.answers%}
+    <div>
+        <p>Spørsmål: {{answer.question_content}}</p>
+        <p>Du svarte: {{answer.content}}</p>
+        {% if answer.is_correct %}
+        <p>Riktig!</p>
+        {% else %}
+        <p>Feil</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <a href="{{url_for('main.home')}}" class="btn btn-primary">Tilbake til quizzer</a>
+</div>
+{% endblock %}

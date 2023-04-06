@@ -1,5 +1,4 @@
-from hashlib import new
-from flask import Blueprint, redirect, render_template, url_for, request
+from flask import Blueprint, redirect, render_template, url_for, request, flash
 from flask_login import login_required, current_user
 from webquiz.models.UserQuiz import UserQuizTable, UserQuiz, Answer
 from webquiz.models.Quiz import QuizTable, Quiz
@@ -21,7 +20,16 @@ def home():
         for quiz in result:
             quizzes.append(Quiz(*quiz))
 
-    return render_template('home.html', user=current_user, quizzes=quizzes)
+    with UserQuizTable() as db:
+        result = db.get_by_user(current_user.id)
+        user_quizzes = {}
+        for quiz in result:
+            if quiz[1] in user_quizzes:
+                user_quizzes[quiz[1]] += 1
+            else:
+                user_quizzes[quiz[1]] = 1
+        
+    return render_template('home.html', user=current_user, quizzes=quizzes, user_quizzes=user_quizzes)
 
 @main.route('/quiz')
 @login_required
@@ -98,11 +106,53 @@ def quiz_question():
         # review quiz before saving
         with UserQuizTable() as db:
             db.get_user_answers(quiz)
-        # with QuestionTable() as db:
-        #     for answer in quiz.answers:
-        #         question = db.get_question(id=answer.question)
-        #         answer.question.content = question.content
-        
+
         return render_template('quiz.html', quiz=quiz)
 
-    return render_template('home.html')
+
+@main.route('/edit-answer', methods=['GET', 'POST'])
+@login_required
+def edit_answer():
+    quiz_id = request.args['quiz_id']
+    question_id = request.args['question_id']
+
+    with QuestionTable() as db:
+        question = db.get_question(question_id)
+        question.choices = db.get_choices(question_id)
+
+    if question.is_multiple_choice:
+        form = ChoiceAnswerForm() 
+        form.answer.choices = [(c.content, c.content) for c in question.choices]
+    else:
+        form = TextAnswerForm()
+        
+    if form.validate_on_submit():
+        with UserQuizTable() as db:
+            # update answer 
+            db.update_answer(quiz_id, question_id, form.answer.data)
+            quiz = db.get_by_id(quiz_id)
+            db.get_user_answers(quiz)
+
+        return render_template('quiz.html', quiz=quiz)
+
+    with UserQuizTable() as db:
+        answer = db.get_user_answer(quiz_id, question_id)
+
+    form.answer.data = answer.content
+    form.question_id.data = question.id
+    return render_template('editAnswer.html', 
+                            quiz_id=quiz_id,
+                            form=form, 
+                            question=question)
+
+@main.route('/quiz_results')
+@login_required
+def quiz_results():
+    id = request.args['id']
+
+    with UserQuizTable() as db:
+        quiz = db.get_by_id(id)
+        db.check_answers(quiz)
+
+    
+    return render_template('results.html', quiz=quiz)
