@@ -4,11 +4,11 @@ from webquiz.models.Quiz import QuizTable, Quiz
 from webquiz.models.Question import QuestionTable, Question, Choice
 
 class Answer:
-    def __init__(self, user_quiz, question, content, choice=None):
+    def __init__(self, user_quiz, question, content):
         self.user_quiz = user_quiz
         self.question = question
         self.content = content
-        self.choice = choice
+        self.question_content = None
 
 class UserQuiz:
     def __init__(self, id, quiz, user, date_taken=None):
@@ -36,6 +36,17 @@ class UserQuizTable(Database):
             query = """INSERT INTO UserQuiz (id, quiz, user)
                         VALUES (%s, %s, %s)"""
             values = (user_quiz.id, user_quiz.quiz, user_quiz.user)
+            self.cursor.execute(query, values)
+            return True
+        except mysql.connector.Error as err:
+            print(err)
+            return False
+        
+    def create_answer(self, answer):
+        try:
+            query = """INSERT INTO Answer (user_quiz, question, content)
+                        VALUES (%s, %s, %s)"""
+            values = (answer.user_quiz, answer.question, answer.content)
             self.cursor.execute(query, values)
             return True
         except mysql.connector.Error as err:
@@ -102,3 +113,13 @@ class UserQuizTable(Database):
                 question = db.get_question(id)
                 question.choices = db.get_choices(question.id)
                 user_quiz.add_question(question)
+
+    def get_user_answers(self, user_quiz):
+        self.get_answers(user_quiz)
+        if user_quiz.answers:
+            for answer in user_quiz.answers:
+                # get question
+                with QuestionTable() as db:
+                    question = db.get_question(answer.question)
+                    answer.question_content = question.content
+            

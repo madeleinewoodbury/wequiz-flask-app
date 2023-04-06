@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="quiz">
-    <h2 class="text-large text-primary">Quiz tid</h2>
-
+    {% if quiz %}
+    <h2 class="text-large text-primary">Dine svar</h2>
+    {% for answer in quiz.answers%}
+    <div>
+        <p>Spørsmål: {{answer.question_content}}</p>
+        <p>Svar: {{answer.content}}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

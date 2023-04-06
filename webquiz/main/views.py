@@ -64,27 +64,45 @@ def quiz_question():
 
         if multiple_choice:
             form.answer.choices = [(c.content, c.content) for c in question.choices]
-            
+
         if form.validate():
-            print(form.answer.data)
+            content = form.answer.data
+            question_id = form.question_id.data
+            answer = Answer(user_quiz=id, question=question_id, content=content)
 
+            # save answer to database and get next question
+            with UserQuizTable() as db:
+                db.create_answer(answer)
+
+
+    # get the next question
+    if quiz.questions and current < len(quiz.questions):
+        question = quiz.questions[current]
+        current += 1
+        if question.is_multiple_choice:
+            form = ChoiceAnswerForm()
+            form.answer.choices = [(c.content, c.content) for c in question.choices]
+        else:
+            form = TextAnswerForm()
+
+        form.answer.data = ""
+        form.question_id.data = question.id
+        return render_template('question.html', 
+                                id=id,
+                                quiz=quiz_id,
+                                form=form, 
+                                question=question.content,
+                                multiple_choice = question.is_multiple_choice,
+                                current=current)
     else:
-        if quiz.questions and current < len(quiz.questions):
-            question = quiz.questions[current]
-            current += 1
-            if question.is_multiple_choice:
-                form = ChoiceAnswerForm()
-                form.answer.choices = [(c.content, c.content) for c in question.choices]
-            else:
-                form = TextAnswerForm()
-
-            form.question_id.data = question.id
-            return render_template('question.html', 
-                                    id=id,
-                                    quiz=quiz_id,
-                                    form=form, 
-                                    question=question.content,
-                                    multiple_choice = question.is_multiple_choice,
-                                    current=current)
+        # review quiz before saving
+        with UserQuizTable() as db:
+            db.get_user_answers(quiz)
+        # with QuestionTable() as db:
+        #     for answer in quiz.answers:
+        #         question = db.get_question(id=answer.question)
+        #         answer.question.content = question.content
+        
+        return render_template('quiz.html', quiz=quiz)
 
     return render_template('home.html')
