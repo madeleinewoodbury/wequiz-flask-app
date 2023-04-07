@@ -139,9 +139,8 @@ INSERT INTO `Choice` (`id`, `question`, `content`, `is_correct`) VALUES
 ('ffcefc50-bd14-4e5a-8885-e11954a509ac', '73a8294c-afbc-4c61-99a3-3288b0c987ac', '41', 0);
 
 
-SELECT
-    A.content,
-    C.is_correct
-FROM Answer AS A
-INNER JOIN Choice AS C
-ON C.question = A.question;
+SELECT content, date_taken 
+FROM Answer
+INNER JOIN UserQuiz 
+ON UserQuiz.id = Answer.user_quiz 
+WHERE question = "1148f0bb-e0bf-4799-9b05-15ca2aa7ab48";

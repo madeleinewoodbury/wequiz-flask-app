@@ -1,6 +1,4 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-import mysql.connector
-from config import Database
 
 class User:
     def __init__(self, id, firstname, lastname, email, password=None, role=None, createdAt=None):
@@ -35,43 +33,3 @@ class User:
     
     def is_anonymous(self):
         return self.is_anonymous
-
-
-class UserTable(Database):
-    def __init__(self):
-        super().__init__()
-    
-    def get_user_by_id(self, id):
-        try:
-            query = """SELECT id, firstname, lastname, email, password, role, created_at
-                       FROM User WHERE id=(%s)"""
-            self.cursor.execute(query, (id,))
-            result = self.cursor.fetchone()
-        except mysql.connector.Error as err:
-                print(err)
-        return result
-    
-    def get_user_by_email(self, email):
-        try:
-            query = """SELECT id, firstname, lastname, email, password, role, created_at
-                       FROM User WHERE email=(%s)"""
-            self.cursor.execute(query, (email,))
-            result = self.cursor.fetchone()
-        except mysql.connector.Error as err:
-                print(err)
-        return result
-    
-    def create(self, user):
-         try:
-              query = """INSERT INTO User (id, firstname, lastname, email, password)
-                         VALUES (%s, %s, %s, %s, %s)"""
-              values = (user.id, 
-                        user.firstname,
-                        user.lastname,
-                        user.email,
-                        user.password)
-              self.cursor.execute(query, values)
-              return True
-         except mysql.connector.Error as err:
-              print(err)
-              return False

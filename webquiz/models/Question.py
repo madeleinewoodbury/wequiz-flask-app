@@ -17,6 +17,7 @@ class Question:
         self.is_multiple_choice = is_multiple_choice
         self.choices = []
         self.quiz = None
+        self.user_answers = []
 
     def add_choice(self, id, content):
         self.choices.append(Choice(id, self.id, content, False))

@@ -251,6 +251,21 @@ textarea {
   justify-content: space-between;
 }
 
+.answer-result {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: white;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.answer-result.correct {
+  background-color: var(--success-color);
+}
+.answer-result.wrong {
+  background-color: var(--danger-color);
+}
+
 @media (max-width: 700px) {
   .container {
     margin-top: 8rem;

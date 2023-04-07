@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_login import LoginManager
-from webquiz.models.User import User, UserTable
+from webquiz.models.AuthDB import AuthDB
 from webquiz.main.views import main
 from webquiz.auth.views import auth
 from webquiz.admin.views import admin
@@ -20,8 +20,8 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id):
-        with UserTable() as db:
-            user = User(*db.get_user_by_id(id))
+        with AuthDB() as db:
+            user = db.get_user_by_id(id)
         return user
     
     return app

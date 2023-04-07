@@ -3,18 +3,24 @@
 <div class="quiz">
     {% if quiz %}
     <h2 class="text-large text-primary">Dine Resultater</h2>
-    {% for answer in quiz.answers%}
-    <div>
-        <p>Spørsmål: {{answer.question_content}}</p>
-        <p>Du svarte: {{answer.content}}</p>
-        {% if answer.is_correct %}
-        <p>Riktig!</p>
-        {% else %}
-        <p>Feil</p>
-        {% endif %}
+    {% for i in range(0, answers)%}
+    {% if quiz.answers[i].is_correct %}
+    <div class="answer-result correct">
+        <h3>Spørsmål {{i+1}}: Riktig!</h3>
+        <p>{{quiz.answers[i].question_content}}</p>
+        <p>{{quiz.answers[i].content}}</p>
     </div>
+    {% else %}
+    <div class="answer-result wrong">
+        <h3>Spørsmål {{i+1}}: Feil</h3>
+        <p>{{quiz.answers[i].question_content}}</p>
+        <p>{{quiz.answers[i].content}}</p>
+    </div>
+
+    {% endif %}
     {% endfor %}
     {% endif %}
+
     <a href="{{url_for('main.home')}}" class="btn btn-primary">Tilbake til quizzer</a>
 </div>
 {% endblock %}

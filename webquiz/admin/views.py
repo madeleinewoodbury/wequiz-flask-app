@@ -5,6 +5,7 @@ from webquiz.admin.forms import QuizForm, QuestionForm
 from webquiz.models.Quiz import Quiz, QuizTable
 from webquiz.models.Question import Question, QuestionTable, Choice
 from webquiz.models.Category import CategoryTable
+from webquiz.models.UserQuiz import UserQuizTable
 
 from uuid import uuid4
 
@@ -46,7 +47,24 @@ def create_quiz():
     else:
         return redirect(url_for('main.home'))
 
+@admin.route('/view_quiz', methods=['GET'])
+@login_required
+def view_quiz():
+    if current_user.is_admin():
+        id = request.args['id']
 
+        with QuizTable() as db:
+            quiz = db.get_by_id(id)
+            db.get_questions(quiz)
+        
+        with UserQuizTable() as db:
+            for question_id in quiz.questions:
+                db.get_user_answers_by_question(question_id)
+
+        return render_template('quizView.html')
+
+    else:
+        return redirect(url_for('main.home'))
 @admin.route('/quiz', methods=['GET'])
 @login_required
 def quiz():

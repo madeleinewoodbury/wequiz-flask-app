@@ -19,7 +19,9 @@
                 <tbody>
                     {% for q in quizzes %}
                     <tr>
-                        <td>{{q.title}}</td>
+                        <td>
+                            <a href="{{url_for('admin.view_quiz', id=q.id)}}">{{q.title}}</a>
+                        </td>
                         <td>
                             {% if q.is_active%}
                             Aktiv

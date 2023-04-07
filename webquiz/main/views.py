@@ -155,4 +155,4 @@ def quiz_results():
         db.check_answers(quiz)
 
     
-    return render_template('results.html', quiz=quiz)
+    return render_template('results.html', quiz=quiz, answers=len(quiz.answers))
