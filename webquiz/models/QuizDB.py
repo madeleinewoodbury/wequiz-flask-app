@@ -1,101 +1,277 @@
+from random import choice
 import mysql.connector
 from config import Database
-from webquiz.models.Quiz import QuizTable, Quiz
-from webquiz.models.Question import QuestionTable, Question, Choice
+from webquiz.models.Quiz import Quiz
+from webquiz.models.Question import Question
+from webquiz.models.Choice import Choice
+from webquiz.models.Answer import Answer
+from webquiz.models.UserQuiz import UserQuiz
+from uuid import uuid4
 
-class Answer:
-    def __init__(self, user_quiz, question, content):
-        self.user_quiz = user_quiz
-        self.question = question
-        self.content = content
-        self.question_content = None
-        self.is_correct = False
-
-class UserQuiz:
-    def __init__(self, id, quiz, user, date_taken=None):
-        self.id = id
-        self.quiz = quiz
-        self.user = user
-        self.date_taken = date_taken
-        self.answers = []
-        self.questions = []
-        self.results = []
-        self.current = 0
-    
-    def add_answer(self, answer):
-        self.answers.append(answer)
-
-    def add_question(self, question):
-        self.questions.append(question)
-
-    def add_results(self, results):
-        pass
-    
-
-class UserQuizTable(Database):
+class QuizDB(Database):
     def __init__(self):
         super().__init__()
     
-    def create(self, user_quiz):
+    # CREATE
+    def create_quiz(self, title):
         try:
-            query = """INSERT INTO UserQuiz (id, quiz, user)
-                        VALUES (%s, %s, %s)"""
-            values = (user_quiz.id, user_quiz.quiz, user_quiz.user)
+            id = str(uuid4())
+            query = """INSERT INTO Quiz (id, title)
+                       VALUES (%s, %s)"""
+            values = (id, title)
             self.cursor.execute(query, values)
-            return True
+            return id
+        
         except mysql.connector.Error as err:
             print(err)
-            return False
+
+    def create_question(self, category, content, multiple_choice):
+        try:
+            id = str(uuid4())
+            question = Question(id, category, content, multiple_choice)
+            query = """INSERT INTO Question (id, category, content, is_multiple_choice)
+                       VALUES (%s, %s, %s, %s)"""
+            values = (question.id, 
+                      question.category,
+                      question.content,
+                      question.is_multiple_choice)
+            self.cursor.execute(query, values)
+            return id
         
-    def create_answer(self, answer):
+        except mysql.connector.Error as err:
+            print(err)
+        
+    def create_choice(self, question_id, content, is_correct):
+        try:
+            id = str(uuid4())
+            # choice = Choice(id, question_id, content, is_correct)
+            query = """INSERT INTO Choice (id, question, content, is_correct)
+                       VALUES (%s, %s, %s, %s)"""
+            values = (id, question_id, content, is_correct)
+            self.cursor.execute(query, values)
+            return id
+        
+        except mysql.connector.Error as err:
+            print(err)
+
+    def create_quiz_question(self, quiz_id, question_id):
+        try:
+            query = """INSERT INTO QuizQuestion (quiz, question)
+                       VALUES (%s, %s)"""
+            values = (quiz_id, question_id)
+            self.cursor.execute(query, values)
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    def create_user_quiz(self, quiz_id, user_id):
+        try:
+            id = str(uuid4())
+            query = """INSERT INTO UserQuiz (id, quiz, user)
+                       VALUES (%s, %s, %s)"""
+            values = (id, quiz_id, user_id)
+            self.cursor.execute(query, values)
+            return id
+        
+        except mysql.connector.Error as err:
+            print(err)
+
+    def create_answer(self, user_quiz_id, question_id, content):
         try:
             query = """INSERT INTO Answer (user_quiz, question, content)
-                        VALUES (%s, %s, %s)"""
-            values = (answer.user_quiz, answer.question, answer.content)
+                       VALUES (%s, %s, %s)"""
+            values = (user_quiz_id, question_id, content)
             self.cursor.execute(query, values)
-            return True
+        
         except mysql.connector.Error as err:
             print(err)
-            return False
+    
+    # UPDATE
+    def update_question(self, id, category, content, is_multiple_choice):
+        try:
+            query = """UPDATE Question 
+                       SET category=(%s), content=(%s), is_multiple_choice=(%s)
+                       WHERE id=(%s)"""
+            values = (category, content, is_multiple_choice, id)
+            self.cursor.execute(query, values)
+        except mysql.connector.Error as err:
+            print(err)
+
+    def update_answer(self, quiz_id, question_id, new_content):
+        try:
+            query = """UPDATE Answer SET content=(%s) WHERE user_quiz=(%s) AND question=(%s)"""
+            self.cursor.execute(query, (new_content, quiz_id, question_id))
+        except mysql.connector.Error as err:
+            print(err)
+
+    def update_choice(self, id, content):
+        try:
+            query = """UPDATE Choice SET content=(%s) WHERE id=(%s)"""
+            values = (content, id)
+            self.cursor.execute(query, values)
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    # GET
+    def get_quiz(self, id):
+        try:
+            query = """SELECT * FROM Quiz WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
+            result = self.cursor.fetchone()
+            quiz = Quiz(*result)
+            return quiz
         
-    def get_by_id(self, id):
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_quizzes(self):
+        try:
+            query = """SELECT * FROM Quiz"""
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            
+            quizzes = []
+            for quiz in result:
+                quizzes.append(Quiz(*quiz))
+
+            return quizzes
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_user_quiz(self, id):
         try:
             query = """SELECT * FROM UserQuiz WHERE id=(%s)"""
             self.cursor.execute(query, (id,))
             result = self.cursor.fetchone()
             user_quiz = UserQuiz(*result)
-            self.get_quiz_questions(user_quiz)
             return user_quiz
-        except mysql.connector.Error as err:
-            print(err)
-    
-    def get_all(self):
-        try:
-            query = """SELECT * FROM UserQuiz"""
-            self.cursor.execute(query)
-            result = self.cursor.fetchall()
-            return result
+        
         except mysql.connector.Error as err:
             print(err)
 
-    def get_by_user(self, user_id):
+    def get_user_quizzes(self, user_id):
         try:
             query = """SELECT * FROM UserQuiz WHERE user=(%s)"""
             self.cursor.execute(query, (user_id,))
             result = self.cursor.fetchall()
-            return result
+            quizzes = []
+            for quiz in result:
+                quizzes.append(UserQuiz(*quiz))
+            return quizzes
         except mysql.connector.Error as err:
             print(err)
 
-    def get_by_user_and_quiz(self, quiz_id, user_id):
+    def get_quiz_attempts(self, quiz_id, user_id):
         try:
-            query = """SELECT * FROM UserQuiz WHERE quiz=(%s) AND user=(%s)"""
+            query = """SELECT COUNT(*) FROM UserQuiz WHERE quiz=(%s) AND user=(%s)"""
             self.cursor.execute(query, (quiz_id, user_id))
+            result = self.cursor.fetchone()
+            return result[0]
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_question(self, id):
+        try:
+            query = """SELECT * FROM Question WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
+            result = self.cursor.fetchone()
+            question = Question(*result)
+            return question
+        
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_questions(self, quiz):
+        try:
+            query = """SELECT Q.id, Q.category, Q.content, Q.is_multiple_choice
+                       FROM Question AS Q
+                       INNER JOIN QuizQuestion AS QQ ON QQ.question = Q.id 
+                       WHERE QQ.quiz=(%s)"""
+            self.cursor.execute(query, (quiz.id,))
+            result = self.cursor.fetchall()
+
+            for question in result:
+                quiz.add_question(Question(*question))
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_questions_v2(self, quiz_id):
+        try:
+            query = """SELECT Q.id, Q.category, Q.content, Q.is_multiple_choice
+                       FROM Question AS Q
+                       INNER JOIN QuizQuestion AS QQ ON QQ.question = Q.id 
+                       WHERE QQ.quiz=(%s)"""
+            self.cursor.execute(query, (quiz_id,))
+            result = self.cursor.fetchall()
+            questions = []
+            for question in result:
+                questions.append(Question(*question))
+
+            return questions
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_categories(self):
+        try:
+            self.cursor.execute("SELECT * FROM Category ORDER BY name DESC")
             result = self.cursor.fetchall()
             return result
+        
         except mysql.connector.Error as err:
             print(err)
 
+    def get_choice(self, id):
+        try:
+            query = """SELECT * FROM Choice WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
+            result = self.cursor.fetchone()
+            choice = Choice(*result)
+            return choice
+        
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_choices(self, question_id):
+        try:
+            query = """SELECT * FROM Choice WHERE question=(%s)"""
+            self.cursor.execute(query, (question_id,))
+            result = self.cursor.fetchall()
+            choices = []
+            for choice in result:
+                choices.append(Choice(*choice))
+            
+            return choices
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_alternatives(self, question_id):
+        try:
+            query = """SELECT * FROM Choice 
+                       WHERE question=(%s) AND NOT is_correct"""
+            self.cursor.execute(query, (question_id,))
+            result = self.cursor.fetchall()
+            choices = []        
+            for choice in result:
+                choices.append(Choice(*choice))
+
+            return choices
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_answer(self, question_id):
+        try:
+            query = """SELECT * FROM Choice WHERE question=(%s) AND is_correct=1"""
+            self.cursor.execute(query, (question_id,))
+            result = self.cursor.fetchone()
+            answer = Choice(*result)
+            return answer
+        except mysql.connector.Error as err:
+            print(err)
+    
     def get_user_answer(self, quiz_id, question_id):
         try:
             query = """SELECT content FROM Answer WHERE user_quiz=(%s) AND question=(%s)"""
@@ -106,74 +282,72 @@ class UserQuizTable(Database):
         except mysql.connector.Error as err:
             print(err)
 
-    def get_user_answers_by_question(self, question_id):
+    def get_user_answers(self, question):
         try:
-            query = """SELECT content, date_taken FROM Answer
-                       INNER JOIN UserQuiz ON UserQuiz.id = Answer.user_quiz 
+            query = """SELECT A.user_quiz, content FROM Answer AS A
+                       INNER JOIN UserQuiz ON UserQuiz.id = A.user_quiz 
                        WHERE question=(%s)"""
-            self.cursor.execute(query, (question_id,))
-            result = self.cursor.fetchall()
-            print(result)
-        except mysql.connector.Error as err:
-            print(err)
-
-    def update_answer(self, quiz_id, question_id, new_content):
-        try:
-            query = """UPDATE Answer SET content=(%s) WHERE user_quiz=(%s) AND question=(%s)"""
-            self.cursor.execute(query, (new_content, quiz_id, question_id))
-            return True
-        except mysql.connector.Error as err:
-            print(err)
-
-    def get_answers(self, user_quiz):
-        try:
-            query = """SELECT * FROM Answer WHERE user_quiz=(%s)"""
-            self.cursor.execute(query, (user_quiz.id,))
+            self.cursor.execute(query, (question.id,))
             result = self.cursor.fetchall()
             for answer in result:
-                user_quiz.add_answer(Answer(*answer))
+                user_quiz, content = answer
+                user_answer = Answer(user_quiz, question.id, content)
+                question.add_user_answer(user_answer)
 
-            return True
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_user_answers_by_user_quiz(self, user_quiz_id):
+        try:
+            query = """SELECT * FROM Answer WHERE user_quiz=(%s)"""
+            self.cursor.execute(query, (user_quiz_id,))
+            result = self.cursor.fetchall()
+            answers = []
+            for answer in result:
+                answers.append(Answer(*answer))
+
+            return answers
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    # DELETE
+    def delete_question(self, id):
+        try:
+            query = """DELETE FROM Question
+                    WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
+        except mysql.connector.Error as err:
+            print(err)
+
+    def delete_choice(self, id):
+        try:
+            query = """DELETE FROM Choice
+                       WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
         except mysql.connector.Error as err:
             print(err)
     
-    def get_quiz_questions(self, user_quiz):
-        with QuizTable() as db:
-            quiz = db.get_by_id(user_quiz.quiz)
-            db.get_questions(quiz)
-        
-        for id in quiz.questions:
-            with QuestionTable() as db:
-                question = db.get_question(id)
-                question.choices = db.get_choices(question.id)
-                user_quiz.add_question(question)
-
-    def get_user_answers(self, user_quiz):
-        self.get_answers(user_quiz)
-        if user_quiz.answers:
-            for answer in user_quiz.answers:
-                # get question
-                with QuestionTable() as db:
-                    question = db.get_question(answer.question)
-                    answer.question_content = question.content
-
-    def check_answers(self, quiz):
+    # OTHER
+    def check_answers(self, user_quiz):
         try:
             query = """SELECT Q.id, Q.content, A.content,
                        (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
                         FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
                         WHERE A.user_quiz=(%s)"""
             
-            self.cursor.execute(query, (quiz.id,))
+            self.cursor.execute(query, (user_quiz.id,))
             result = self.cursor.fetchall()
+
             for item in result:
                 question_id, question, user_answer, correct_answer = item
-                answer = Answer(quiz.id, question_id, user_answer)
+                answer = Answer(user_quiz.id, question_id, user_answer)
                 answer.question_content = question
+
                 if user_answer == correct_answer:
                     answer.is_correct = True
 
-                quiz.add_answer(answer)    
+                user_quiz.add_answer(answer)    
 
         except mysql.connector.Error as err:
             print(err)

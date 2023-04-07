@@ -79,8 +79,8 @@ CREATE TABLE Answer (
     question VARCHAR(45) NOT NULL,
     content VARCHAR(255),
     PRIMARY KEY (user_quiz, question),
-    FOREIGN KEY (user_quiz) REFERENCES UserQuiz(id),
-    FOREIGN KEY (question) REFERENCES Question(id)
+    FOREIGN KEY (user_quiz) REFERENCES UserQuiz(id) ON DELETE CASCADE,
+    FOREIGN KEY (question) REFERENCES Question(id) ON DELETE CASCADE
 );
 
 INSERT INTO User (id, role, firstname, lastname, email, password)
@@ -139,8 +139,26 @@ INSERT INTO `Choice` (`id`, `question`, `content`, `is_correct`) VALUES
 ('ffcefc50-bd14-4e5a-8885-e11954a509ac', '73a8294c-afbc-4c61-99a3-3288b0c987ac', '41', 0);
 
 
-SELECT content, date_taken 
-FROM Answer
-INNER JOIN UserQuiz 
-ON UserQuiz.id = Answer.user_quiz 
-WHERE question = "1148f0bb-e0bf-4799-9b05-15ca2aa7ab48";
+-- SELECT content, date_taken 
+-- FROM Answer
+-- INNER JOIN UserQuiz 
+-- ON UserQuiz.id = Answer.user_quiz 
+-- WHERE question = "1148f0bb-e0bf-4799-9b05-15ca2aa7ab48";
+
+
+-- SELECT 
+--     Q.id, 
+--     Q.category, 
+--     Q.content, 
+--     Q.is_multiple_choice
+-- FROM Question AS Q
+-- INNER JOIN QuizQuestion AS QQ 
+--     ON QQ.question = Q.id 
+-- WHERE QQ.quiz="4e68a8a5-ef11-426b-bdc3-2d0c12c0c338";
+
+-- SELECT 
+--     COUNT(*) 
+-- FROM UserQuiz 
+-- WHERE
+--     quiz="4e68a8a5-ef11-426b-bdc3-2d0c12c0c338" AND
+--     user="ba0a424e-8dc7-47e8-97e0-4824d812f4bf";
