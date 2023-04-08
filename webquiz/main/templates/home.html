@@ -1,35 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
+{% if user %}
 <div class="dashboard">
-    {% if user %}
     <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
-    <section>
-        <h3 class="text-primary">Dine Quizzer</h3>
-        {% if quizzes %}
-        <div class="question">
-            <table class='table'>
-                <thead>
-                    <tr>
-                        <th>Quiz</th>
-                        <th>Resultat</th>
-                        <th>Dato Tatt</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for q in quizzes %}
-                    <tr>
-                        <td><a href="{{url_for('main.quiz_results', id=q.id)}}" class="quiz-link">{{q.title}}</a>
-                        </td>
-                        <td>{{q.score}} %</td>
-                        <td>{{q.date_taken}}</td>
-                    </tr>
-                    {% endfor %}
 
-                </tbody>
-            </table>
-            {% else %}
-            <p>Ingen quizzer i databasen</p>
-            {% endif %}
+    {% if quizzes %}
+    <section>
+        <div class="intro">
+            <h3>Dine Quizzer</h3>
+            <a href="{{url_for('main.quizzes')}}" class="btn btn-primary">Ta en ny quiz</a>
+        </div>
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Quiz</th>
+                    <th>Resultat</th>
+                    <th>Dato Tatt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in quizzes %}
+                <tr>
+                    <td><a href="{{url_for('main.quiz_results', id=q.id)}}" class="quiz-link">{{q.title}}</a>
+                    </td>
+                    <td>{{q.score}} %</td>
+                    <td>{{q.date_taken}}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+        {% else %}
+        <p>Ingen quizzer i databasen</p>
+        {% endif %}
     </section>
     {% endif %}
 </div>

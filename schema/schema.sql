@@ -185,5 +185,4 @@ SELECT
 FROM UserQuiz AS U
 INNER JOIN Answer AS A ON A.user_quiz = U.id
 INNER JOIN Quiz AS Q ON Q.id = U.quiz
-WHERE U.user=(%s)
-GROUP BY U.id;
+WHERE U.id="bec45daa-8897-49af-ae89-aed683cc7d30";

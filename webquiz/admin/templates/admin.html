@@ -5,43 +5,41 @@
     <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
     {% endif %}
     <section>
-        <h3 class="text-primary">Quizzer</h3>
+        <div class="intro">
+            <h3>Quizzer</h3>
+            <a href="{{url_for('admin.create_quiz')}}" class="btn btn-primary">Ny Quiz</a>
+        </div>
         {% if quizzes %}
-        <div class="question">
-            <table class='table'>
-                <thead>
-                    <tr>
-                        <th>Quiz</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for q in quizzes %}
-                    <tr>
-                        <td>
-                            <a href="{{url_for('admin.view_quiz', id=q.id)}}">{{q.title}}</a>
-                        </td>
-                        <td>
-                            {% if q.is_active%}
-                            Aktiv
-                            {% else %}
-                            Ikke aktiv
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href={{url_for('admin.quiz', id=q.id)}} class="btn btn-light">Rediger</a>
-                            <a href="#" class="btn btn-danger">Slett</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Quiz</th>
+                    <th>Antall spørsmål</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in quizzes %}
+                <tr class="{{'active' if q.is_active else ''}}">
+                    <td>
+                        <a href="{{url_for('admin.quiz', id=q.id)}}" class="quiz-link">{{q.title}}</a>
+                    </td>
+                    <td>{{q.get_number_of_questions()}}</td>
+                    <td>
+                        {% if q.is_active%}
+                        <span class="status bg-success">Aktiv</span>
+                        {% else %}
+                        <span class="status bg-danger">Ikke Aktiv</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
 
-                </tbody>
-            </table>
-            {% else %}
-            <p>Ingen quizzer i databasen</p>
-            {% endif %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Ingen quizzer i databasen</p>
+        {% endif %}
     </section>
-
 </div>
 {% endblock %}

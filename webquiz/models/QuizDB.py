@@ -87,6 +87,13 @@ class QuizDB(Database):
             print(err)
     
     # UPDATE
+    def update_quiz(self, id, title):
+        try:
+            query = """UPDATE Quiz SET title=(%s) WHERE id=(%s)"""
+            self.cursor.execute(query, (title, id))
+        except mysql.connector.Error as err:
+            print(err)
+
     def update_question(self, id, category, content, is_multiple_choice):
         try:
             query = """UPDATE Question 
@@ -112,6 +119,14 @@ class QuizDB(Database):
 
         except mysql.connector.Error as err:
             print(err)
+
+    def update_status(self, quiz_id, status):
+        try:
+            query = """UPDATE Quiz SET is_active=(%s) WHERE id=(%s)"""
+            self.cursor.execute(query, (status, quiz_id,))
+        except mysql.connector.Error as err:
+            print(err)
+
 
     # GET
     def get_quiz(self, id):
@@ -154,8 +169,6 @@ class QuizDB(Database):
             
             self.cursor.execute(query, (id,))
             result = self.cursor.fetchone()
-            # user_quiz = UserQuiz(*result)
-            print(result)
             quiz_id, user_id, date_taken, title, correct_answers = result
             user_quiz = UserQuiz(id, quiz_id, user_id, date_taken)
             user_quiz.title = title
@@ -343,6 +356,13 @@ class QuizDB(Database):
             print(err)
 
     # DELETE
+    def delete_quiz(self, id):
+        try:
+            query = """DELETE FROM Quiz WHERE id=(%s)"""
+            self.cursor.execute(query, (id,))
+        except mysql.connector.Error as err:
+            print(err)
+
     def delete_question(self, id):
         try:
             query = """DELETE FROM Question

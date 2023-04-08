@@ -9,6 +9,9 @@ class Quiz:
     def add_question(self, question):
         self.questions.append(question)
 
+    def get_number_of_questions(self):
+        return len(self.questions)
+
     def __str__(self):
         return f"id: {self.id}\ntitle: {self.title}"
     

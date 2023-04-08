@@ -1,20 +1,27 @@
 !{% extends "base.html" %}
 {% block content %}
 {% if quiz %}
-<h2 class="text-large text-primary">Quiz: {{quiz.title}}</h2>
 <div class="quiz">
-    <div class="btn-container">
-        <a class="btn btn-primary" href="{{url_for('admin.create_question', quiz_id=quiz.id)}}">Legg til spørsmål</a>
-        <a class="btn btn-secondary" href="#">Endre</a>
-        <a class="btn btn-danger" href="#">Slette</a>
+    <h2 class="text-large text-primary">Quiz: {{quiz.title}}</h2>
+    <div class="info">
+        <div class="btn-container">
+            <a class="btn btn-primary" href="{{url_for('admin.create_question', quiz_id=quiz.id)}}">Nytt spørsmål</a>
+            <a class="btn btn-secondary" href="{{url_for('admin.update_quiz', id=quiz.id)}}">Endre</a>
+            <a class="btn btn-danger" href="#">Slette</a>
+        </div>
+        {% if quiz.is_active%}
+        <a href="{{url_for('admin.activate', id=quiz.id, status=0)}}" class="btn btn-danger">Deaktiver</a>
+        {% else %}
+        <a href="{{url_for('admin.activate', id=quiz.id, status=1)}}" class="btn btn-success">Aktiver</a>
+        {% endif %}
     </div>
     {% if quiz.questions %}
     <div class="question">
         <table class='table'>
             <thead>
                 <tr>
-                    <th>Question</th>
-                    <th>Category</th>
+                    <th>Spørsmål</th>
+                    <th>Kategorie</th>
                     <th></th>
                 </tr>
             </thead>

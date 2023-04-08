@@ -64,6 +64,19 @@ ul {
   color: var(--dark-color);
 }
 
+.status {
+  padding: 0.2rem 0.5rem;
+  color: white;
+}
+
+.bg-success {
+  background-color: var(--success-color);
+}
+
+.bg-danger {
+  background-color: var(--danger-color);
+}
+
 .text-white {
   color: white;
 }
@@ -215,14 +228,20 @@ textarea {
 }
 
 /* Dashboard */
-.dashboard {
+.intro {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.intro h3 {
+  font-size: 1.3rem;
 }
 
 .table {
+  margin-top: 1rem;
   width: 100%;
-  margin-top: 2rem;
 }
 
 .table th,
@@ -235,12 +254,17 @@ textarea {
   background: var(--light-color);
 }
 
-.table tr:hover {
+.table td.active {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.dashboard .table tr:hover {
   background-color: var(--primary-color);
   color: white;
 }
 
-.table tr {
+.dashboard .table tr {
   pointer-events: none;
 }
 
@@ -273,7 +297,16 @@ textarea {
   justify-content: space-between;
 }
 
-/* Results */
+/* Results / Quiz */
+.quiz .answer {
+  margin-bottom: 1rem;
+}
+
+.quiz .answer .btn {
+  padding: 0.2rem 1rem;
+  margin-top: 0.5rem;
+}
+
 .quiz .info {
   display: flex;
   justify-content: space-between;

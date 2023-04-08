@@ -11,7 +11,9 @@ def home():
     if current_user.is_admin():
         with QuizDB() as db:
             quizzes = db.get_quizzes()
-
+            for quiz in quizzes:
+                quiz.questions = db.get_questions_v2(quiz.id)
+                
         return render_template('admin.html', 
                                user=current_user, 
                                quizzes=quizzes)
@@ -41,6 +43,34 @@ def create_quiz():
             for message in form.errors.values():
                 flash(message, category='error')
         return render_template('quizForm.html', form=form)
+    else:
+        return redirect(url_for('main.home'))
+
+@admin.route('/edit-quiz', methods=['GET', 'POST'])
+@login_required
+def update_quiz():
+    if current_user.is_admin():
+        id = request.args['id']
+        form = QuizForm()
+
+        if form.validate_on_submit():
+            with QuizDB() as db:
+                db.update_quiz(id, form.title.data)
+            
+            flash(f"Quizzen oppdatert", category='success')
+            return redirect(url_for('admin.quiz', id=id))
+        
+        if form.errors:
+            for message in form.errors.values():
+                flash(message, category='error')
+
+        with QuizDB() as db:
+            quiz = db.get_quiz(id)
+        
+        form.title.data = quiz.title
+        form.submit.label.text = "Lagre"
+        return render_template('editQuizForm.html', form=form, id=id)
+
     else:
         return redirect(url_for('main.home'))
 
@@ -75,6 +105,23 @@ def quiz():
         return render_template('adminQuiz.html', quiz=quiz)
     else:
         return redirect(url_for('main.home'))
+
+
+@admin.route('/activate', methods=['GET'])
+@login_required
+def activate():
+    id = request.args['id']
+    status = request.args['status']
+    status_text = 'aktiv' if int(status) else 'ikke aktiv'
+
+    with QuizDB() as db:
+        db.update_status(id, status)
+    
+    flash(f'Status satt til {status_text}', 'success')
+
+
+        
+    return redirect(url_for('admin.quiz', id=id))
 
 
 @admin.route('/add-question', methods=['GET', 'POST'])

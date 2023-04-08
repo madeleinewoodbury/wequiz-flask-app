@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-large text-primary">Endre Quiz</h2>
+<form method="POST" action={{url_for('admin.update_quiz', id=id)}}>
+    {{form.hidden_tag()}}
+    <div class="form-group">
+        {{form.title.label}}
+        {{form.title}}
+    </div>
+    {{form.submit(class="btn btn-primary")}}
+</form>
+{% endblock %}

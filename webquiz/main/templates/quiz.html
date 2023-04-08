@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="quiz">
+<section class="quiz">
     {% if quiz %}
-    <h2 class="text-large text-primary">Dine svar</h2>
+    <h2 class="text-large text-primary">Quiz: {{quiz.title}}</h2>
+    <p class="lead">Se over dine svar</p>
     {% for answer in quiz.answers%}
-    <div>
+    <div class="answer">
         <p>Spørsmål: {{answer.question_content}}</p>
         <p>Svar: {{answer.content}}</p>
         <a href={{url_for('main.edit_answer', quiz_id=quiz.id, question_id=answer.question)}}
@@ -13,5 +14,5 @@
     {% endfor %}
     {% endif %}
     <a href="{{url_for('main.quiz_results', id=quiz.id)}}" class="btn btn-primary">Send inn</a>
-</div>
+</section>
 {% endblock %}

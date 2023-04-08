@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, url_for, request
+from flask import Blueprint, redirect, render_template, url_for, request, flash
 from flask_login import login_required, current_user
 from webquiz.models.QuizDB import QuizDB
 from webquiz.main.forms import ChoiceAnswerForm, TextAnswerForm
@@ -27,8 +27,15 @@ def quizzes():
     
     with QuizDB() as db:
         quizzes = db.get_quizzes()
+        user_attempts = {}
+        for quiz in quizzes:
+            user_attempts[quiz.id] = db.get_quiz_attempts(quiz.id, current_user.id)
+            quiz.questions = db.get_questions_v2(quiz.id)
         
-    return render_template('quizzes.html', user=current_user, quizzes=quizzes)
+    return render_template('quizzes.html', 
+                           user=current_user, 
+                           quizzes=quizzes,
+                           attempts=user_attempts)
 
 @main.route('/quiz')
 @login_required
@@ -36,16 +43,22 @@ def quiz():
     quiz_id = request.args['id']
 
     with QuizDB() as db:
-        prev_attempts = db.get_quiz_attempts(quiz_id, current_user.id)
+        quiz = db.get_quiz(quiz_id)
+        if not quiz.is_active:
+            flash('Denne quizzen er ikke lenger aktiv', 'error')        
+            return redirect(url_for('main.home'))
         
+        prev_attempts = db.get_quiz_attempts(quiz_id, current_user.id)
+    
         # can only take a quiz max 3 times
-        if prev_attempts < 10: #TODO
+        if prev_attempts < 3: 
             id = db.create_user_quiz(quiz_id=quiz_id, user_id=current_user.id)
             return redirect(url_for('main.quiz_question',
                                     user_quiz_id=id, 
                                     quiz_id=quiz_id,
                                     current=0))
         else:
+            flash('Du har ingen flere forsøk for denne quizzen', 'error')
             return redirect(url_for('main.home'))
 
 
