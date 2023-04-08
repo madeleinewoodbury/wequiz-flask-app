@@ -2,7 +2,11 @@
 {% block content %}
 <div class="quiz">
     {% if quiz %}
-    <h2 class="text-large text-primary">Dine Resultater</h2>
+    <h2 class="text-large text-primary">{{quiz.title}} ({{quiz.score}} %)</h2>
+    <div class="info">
+        <h3>Du klarte {{quiz.correct}} av {{answers}}</h3>
+        <span>{{quiz.date_taken}}</span>
+    </div>
     {% for i in range(0, answers)%}
     {% if quiz.answers[i].is_correct %}
     <div class="answer-result correct">
@@ -21,6 +25,9 @@
     {% endfor %}
     {% endif %}
 
-    <a href="{{url_for('main.home')}}" class="btn btn-primary">Tilbake til quizzer</a>
+    {% if attempts < 3%} <a href="{{url_for('main.quiz', id=quiz.quiz)}}" class="btn btn-light">Ta igjen</a>
+        {% endif %}
+        <a href="{{url_for('main.home')}}" class="btn btn-primary">Dine Quizzer</a>
+
 </div>
 {% endblock %}

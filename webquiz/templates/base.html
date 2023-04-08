@@ -19,6 +19,10 @@
             <li>
                 <a href={{url_for('admin.create_quiz')}}>Ny Quiz</a>
             </li>
+            {% else %}
+            <li>
+                <a href={{url_for('main.quizzes')}}>Alle Quizzer</a>
+            </li>
             {% endif %}
             <li>
                 <a href={{url_for('auth.logout')}}>Logg Ut</a>

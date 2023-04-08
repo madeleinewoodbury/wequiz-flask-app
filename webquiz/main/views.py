@@ -12,13 +12,23 @@ def home():
         return redirect(url_for('admin.home'))
     
     with QuizDB() as db:
-        quizzes = db.get_quizzes()
-        user_quizzes = db.get_user_quizzes(current_user.id) #TODO
+        user_quizzes = db.get_user_quizzes(current_user.id)
+        for quiz in user_quizzes:
+            quiz.questions = db.get_questions_v2(quiz_id=quiz.quiz)
+            quiz.calculate_score()
         
-    return render_template('home.html', 
-                           user=current_user, 
-                           quizzes=quizzes, 
-                           user_quizzes=user_quizzes)
+    return render_template('home.html', user=current_user, quizzes=user_quizzes)
+
+@main.route('/quizzes')
+@login_required
+def quizzes():
+    if current_user.is_admin():
+        return redirect(url_for('admin.home'))
+    
+    with QuizDB() as db:
+        quizzes = db.get_quizzes()
+        
+    return render_template('quizzes.html', user=current_user, quizzes=quizzes)
 
 @main.route('/quiz')
 @login_required
@@ -142,8 +152,13 @@ def quiz_results():
 
     with QuizDB() as db:
         user_quiz = db.get_user_quiz(id)
-        db.check_answers(user_quiz)
+        user_quiz.questions = db.get_questions_v2(user_quiz.quiz)
+        user_quiz.answers = db.get_answers_with_result(id)
+        user_quiz.calculate_score()
+        attempts = db.get_quiz_attempts(user_quiz.quiz, current_user.id)
 
     return render_template('results.html', 
                            quiz=user_quiz, 
-                           answers=len(user_quiz.answers))
+                           answers=len(user_quiz.answers),
+                           attempts=attempts,
+                           user=current_user)

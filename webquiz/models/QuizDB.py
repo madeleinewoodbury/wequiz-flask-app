@@ -141,10 +141,25 @@ class QuizDB(Database):
 
     def get_user_quiz(self, id):
         try:
-            query = """SELECT * FROM UserQuiz WHERE id=(%s)"""
+            # query = """SELECT * FROM UserQuiz WHERE id=(%s)"""
+            query = """SELECT U.quiz, U.user, U.date_taken, Q.title,
+                       SUM(CASE WHEN A.content = (SELECT C.content FROM Choice AS C 
+                                                  WHERE C.question = A.question AND C.is_correct=1) 
+                                THEN 1 ELSE 0
+                            END) AS is_correct
+                        FROM UserQuiz AS U
+                        INNER JOIN Answer AS A ON A.user_quiz = U.id
+                        INNER JOIN Quiz AS Q ON Q.id = U.quiz
+                        WHERE U.id=(%s)"""
+            
             self.cursor.execute(query, (id,))
             result = self.cursor.fetchone()
-            user_quiz = UserQuiz(*result)
+            # user_quiz = UserQuiz(*result)
+            print(result)
+            quiz_id, user_id, date_taken, title, correct_answers = result
+            user_quiz = UserQuiz(id, quiz_id, user_id, date_taken)
+            user_quiz.title = title
+            user_quiz.correct = correct_answers
             return user_quiz
         
         except mysql.connector.Error as err:
@@ -152,12 +167,28 @@ class QuizDB(Database):
 
     def get_user_quizzes(self, user_id):
         try:
-            query = """SELECT * FROM UserQuiz WHERE user=(%s)"""
+            query = """SELECT U.id, U.quiz, U.date_taken, Q.title,
+                       SUM(CASE WHEN A.content = (SELECT C.content FROM Choice AS C 
+                                                  WHERE C.question = A.question AND C.is_correct=1) 
+                                THEN 1 ELSE 0
+                            END) AS is_correct
+                        FROM UserQuiz AS U
+                        INNER JOIN Answer AS A ON A.user_quiz = U.id
+                        INNER JOIN Quiz AS Q ON Q.id = U.quiz
+                        WHERE U.user=(%s)
+                        GROUP BY U.id
+                        ORDER BY U.date_taken DESC"""
+        
             self.cursor.execute(query, (user_id,))
             result = self.cursor.fetchall()
             quizzes = []
             for quiz in result:
-                quizzes.append(UserQuiz(*quiz))
+                id, quiz_id, date_taken, title, correct_answers = quiz
+                user_quiz = UserQuiz(id, quiz_id, user_id, date_taken)
+                user_quiz.title = title
+                user_quiz.correct = correct_answers
+                quizzes.append(user_quiz)
+
             return quizzes
         except mysql.connector.Error as err:
             print(err)
@@ -328,26 +359,28 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
     
-    # OTHER
-    def check_answers(self, user_quiz):
+    def get_answers_with_result(self, user_quiz_id):
         try:
             query = """SELECT Q.id, Q.content, A.content,
                        (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
                         FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
                         WHERE A.user_quiz=(%s)"""
             
-            self.cursor.execute(query, (user_quiz.id,))
+            self.cursor.execute(query, (user_quiz_id,))
             result = self.cursor.fetchall()
-
+            answers = []
+            
             for item in result:
                 question_id, question, user_answer, correct_answer = item
-                answer = Answer(user_quiz.id, question_id, user_answer)
+                answer = Answer(user_quiz_id, question_id, user_answer)
                 answer.question_content = question
 
                 if user_answer == correct_answer:
                     answer.is_correct = True
 
-                user_quiz.add_answer(answer)    
+                answers.append(answer)
+
+            return answers   
 
         except mysql.connector.Error as err:
             print(err)

@@ -162,3 +162,28 @@ INSERT INTO `Choice` (`id`, `question`, `content`, `is_correct`) VALUES
 -- WHERE
 --     quiz="4e68a8a5-ef11-426b-bdc3-2d0c12c0c338" AND
 --     user="ba0a424e-8dc7-47e8-97e0-4824d812f4bf";
+
+SELECT 
+    Q.id,
+    Q.title,
+FROM UserQuiz AS U
+INNER JOIN Quiz AS Q
+ON Q.id = U.quiz
+GROUP BY Q.id;
+
+-- get quiz score
+SELECT 
+    U.id,
+    U.quiz,
+    Q.title,
+    SUM(CASE 
+        WHEN A.content = (SELECT C.content FROM Choice AS C 
+                          WHERE C.question = A.question AND C.is_correct=1) THEN 1
+        ELSE 0
+    END) AS 'is_correct',
+    (SELECT COUNT(*) FROM QuizQuestion AS QQ WHERE QQ.quiz = Q.id) AS questions
+FROM UserQuiz AS U
+INNER JOIN Answer AS A ON A.user_quiz = U.id
+INNER JOIN Quiz AS Q ON Q.id = U.quiz
+WHERE U.user=(%s)
+GROUP BY U.id;
