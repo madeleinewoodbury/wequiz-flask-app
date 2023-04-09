@@ -178,3 +178,9 @@ INSERT INTO `Choice` (`id`, `question`, `content`, `is_correct`) VALUES
 -- INNER JOIN Answer AS A ON A.user_quiz = U.id
 -- INNER JOIN Quiz AS Q ON Q.id = U.quiz
 -- WHERE U.id="bec45daa-8897-49af-ae89-aed683cc7d30";
+
+SELECT * FROM Quiz
+WHERE id NOT IN (
+SELECT Q.id FROM Quiz AS Q
+INNER JOIN QuizQuestion AS QQ ON QQ.quiz = Q.id 
+WHERE QQ.question = "e2b43992-c2fc-4fec-b378-1fc39a9fbc82");

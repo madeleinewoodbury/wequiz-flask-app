@@ -8,6 +8,7 @@ class Question:
         self.choices = []
         self.quiz = None
         self.user_answers = []
+        self.quizzes = []
 
     def add_choice(self, choice):
         self.choices.append(choice)

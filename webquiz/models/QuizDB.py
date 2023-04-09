@@ -282,6 +282,40 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
+    def get_available_quizzes(self, question_id):
+        try:
+            query = """SELECT * FROM Quiz WHERE id NOT IN (SELECT Q.id FROM Quiz AS Q
+                         INNER JOIN QuizQuestion AS QQ ON QQ.quiz = Q.id 
+                         WHERE QQ.question = (%s))"""
+            
+            self.cursor.execute(query, (question_id,))
+            result = self.cursor.fetchall()
+            quizzes = []
+            for quiz in result:
+                quizzes.append(Quiz(*quiz))
+
+            return quizzes
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    def get_quizzes_by_question(self, question_id):
+        try:
+            query = """SELECT Q.* FROM Quiz AS Q
+                       INNER JOIN QuizQuestion AS QQ ON QQ.quiz = Q.id 
+                       WHERE QQ.question=(%s)"""
+            
+            self.cursor.execute(query, (question_id,))
+            result = self.cursor.fetchall()
+            quizzes = []
+            for quiz in result:
+                quizzes.append(Quiz(*quiz))
+
+            return quizzes
+
+        except mysql.connector.Error as err:
+            print(err)
+
     def get_categories(self):
         try:
             self.cursor.execute("SELECT * FROM Category ORDER BY name DESC")

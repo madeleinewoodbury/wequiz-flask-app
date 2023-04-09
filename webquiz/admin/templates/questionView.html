@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="question-detail">
+    {% if question %}
+    <div class="btn-container">
+        <a class="btn btn-primary" href="{{url_for('admin.add_quiz_question', id=question.id)}}">Legg til quiz</a>
+        <a class="btn btn-secondary" href="{{url_for('admin.update_question', quiz='', id=question.id)}}">Rediger</a>
+        <a class="btn btn-danger" href="{{url_for('admin.delete_question', quiz='', id=question.id)}}">Slette</a>
+    </div>
+    <div>
+        <h3>Kategori</h3>
+        <p>{{question.category}}</p>
+    </div>
+    <div>
+        <h3>Spørsmål</h3>
+        <p>{{question.content}}</p>
+    </div>
+    <div>
+        <h3>Riktig svar</h3>
+        <p>{{question.answer.content}}</p>
+    </div>
+    {% if question.choices %}
+    <div>
+        <h3>Svaralternativer</h3>
+        <ul>
+            {% for choice in question.choices%}
+            <li>
+                <p>{{choice.content}}</p>
+
+            </li>
+            {% endfor%}
+        </ul>
+        {% endif %}
+    </div>
+    {% if question.quizzes %}
+    <div>
+        <h3>Tilhører quiz</h3>
+        <ul>
+            {% for quiz in question.quizzes%}
+            <li>
+                <p>{{quiz.title}}</p>
+
+            </li>
+            {% endfor%}
+        </ul>
+        {% endif %}
+    </div>
+
+
+    {% endif %}
+</div>
+{% endblock %}

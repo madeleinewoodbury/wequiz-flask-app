@@ -18,7 +18,7 @@
     </form>
     {% if questions %}
     <section class="questions">
-        <table class='table'>
+        <table class='table link-table'>
             <thead>
                 <tr>
                     <th>Spørsmål</th>
@@ -29,7 +29,9 @@
             <tbody>
                 {% for q in questions %}
                 <tr>
-                    <td>{{q.content}}</td>
+                    <td>
+                        <a href="{{url_for('admin.question_detail', id=q.id)}}" class="quiz-link">{{q.content}}</a>
+                    </td>
                     <td>{{q.answer.content}}</td>
                     <td class='hide-sm'>{{q.category}}</td>
                 </tr>

@@ -1,7 +1,7 @@
 from unittest import result
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
-from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm, CategoryForm
+from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm, CategoryForm, QuizSelectForm
 from webquiz.models.QuizDB import QuizDB
 
 admin = Blueprint('admin', __name__, template_folder='templates')
@@ -226,7 +226,10 @@ def update_question():
                         db.delete_choice(choice.id)
             
             flash('Spørsmål oppdatert', 'success')
-            return redirect(url_for('admin.quiz', id=quiz_id))
+            if quiz_id:
+                return redirect(url_for('admin.quiz', id=quiz_id))
+            else:
+                return redirect(url_for('admin.question_detail', id=id))
 
         form.id.data = question.id
         form.category.data = question.category
@@ -234,12 +237,30 @@ def update_question():
         form.is_multiple_choice.data = question.is_multiple_choice
         form.answer.data = answer.content
         
-        return render_template('editQuestion.html', 
-                               form=form, 
-                               quiz=quiz_id)
+        if quiz_id:
+            return render_template('editQuestion.html', form=form, quiz=quiz_id)
+        else:
+            return render_template('editQuestion.html', form=form)
 
     else:
         return redirect(url_for('main.home'))
+
+@admin.route('/view_question')
+@login_required
+def question_detail():
+    if current_user.is_admin():
+        id = request.args['id']
+
+        with QuizDB() as db:
+            question = db.get_question(id)
+            question.answer = db.get_answer(id)
+            question.choices = db.get_alternatives(id)
+            question.quizzes = db.get_quizzes_by_question(id)
+
+        return render_template('questionView.html', question=question)
+    else:
+        return redirect(url_for('main.home'))
+    
 
 @admin.route('/questions', methods=['GET', 'POST'])
 @login_required
@@ -276,6 +297,40 @@ def question():
     else:
         return redirect(url_for('main.home'))
 
+@admin.route('/add/quiz-question', methods=['GET', 'POST'])
+@login_required
+def add_quiz_question():
+    if current_user.is_admin():
+        id = request.args['id']
+        form = QuizSelectForm()
+
+        if request.method == 'POST':
+            quiz = form.quiz.data
+            with QuizDB() as db:
+                db.create_quiz_question(quiz, id)
+                flash('Spørsmål lagt til quiz', 'success')
+
+            return redirect(url_for('admin.question_detail', id=id))
+        
+        with QuizDB() as db:
+            quizzes = db.get_available_quizzes(id)
+            if quizzes:
+                choices = []
+                for quiz in quizzes:
+                    choices.append((quiz.id, quiz.title))
+
+                form.quiz.choices = choices
+                form.id.data = id
+        
+                return render_template('addToQuiz.html', form=form)
+            else:
+                flash('Ingen tilgjengelige quizzer', 'error')
+                return redirect(url_for('admin.question_detail', id=id))
+
+    else:
+        return redirect(url_for('main.home'))
+
+
 @admin.route('/delete/question', methods=['GET'])
 @login_required
 def delete_question():
@@ -287,7 +342,10 @@ def delete_question():
             db.delete_question(id)
             flash('Spørsmål slettet', 'success')
 
-        return redirect(url_for('admin.quiz', id=quiz_id))
+        if quiz_id:
+            return redirect(url_for('admin.quiz', id=quiz_id))
+        else:
+            return redirect(url_for('admin.question', id=id))
 
     else:
         return redirect(url_for('main.home'))

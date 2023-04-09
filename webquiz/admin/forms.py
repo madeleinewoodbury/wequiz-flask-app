@@ -31,3 +31,8 @@ class SearchForm(FlaskForm):
     category  = SelectField("Kategori")
     search = StringField()
     submit    = SubmitField("Søk")
+
+class QuizSelectForm(FlaskForm):
+    id        = HiddenField()
+    quiz  = SelectField("Quiz")
+    submit    = SubmitField("Legg til")
