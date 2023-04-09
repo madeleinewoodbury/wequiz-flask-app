@@ -4,7 +4,7 @@
     <header>
         <h2 class="text-large text-primary">Spørsmålsbank</h2>
         <div>
-            <a href="#" class="btn btn-primary">Ny kategori</a>
+            <a href="{{url_for('admin.create_category')}}" class="btn btn-primary">Ny kategori</a>
         </div>
     </header>
     <form class="search" method="POST" action={{url_for('admin.question')}}>

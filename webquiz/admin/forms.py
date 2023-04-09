@@ -23,6 +23,10 @@ class QuizForm(FlaskForm):
     title     = StringField("Tittel", validators=[DataRequired(), Length(min=2, max=45)])
     submit   = SubmitField("Lag Quiz")
 
+class CategoryForm(FlaskForm):
+    name     = StringField("Kategori", validators=[DataRequired(), Length(min=2, max=45)])
+    submit   = SubmitField("Legg til")
+
 class SearchForm(FlaskForm):
     category  = SelectField("Kategori")
     search = StringField()

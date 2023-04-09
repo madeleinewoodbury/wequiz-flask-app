@@ -84,6 +84,17 @@ class QuizDB(Database):
         
         except mysql.connector.Error as err:
             print(err)
+
+    def create_category(self, name):
+        try:
+            query = """INSERT INTO Category (name) VALUES (%s)"""
+            self.cursor.execute(query, (name,))
+            return True
+        except mysql.connector.Error as err:
+            print(err.errno)
+        
+        return False
+
     
     # UPDATE
     def update_quiz(self, id, title):
@@ -155,7 +166,6 @@ class QuizDB(Database):
 
     def get_user_quiz(self, id):
         try:
-            # query = """SELECT * FROM UserQuiz WHERE id=(%s)"""
             query = """SELECT U.quiz, U.user, U.date_taken, Q.title,
                        SUM(CASE WHEN A.content = (SELECT C.content FROM Choice AS C 
                                                   WHERE C.question = A.question AND C.is_correct=1) 
@@ -239,19 +249,6 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
-    # def get_questions_by_category(self, category):
-    #     try:
-    #         query = """SELECT * FROM Question WHERE category=(%s)"""
-    #         self.cursor.execute(query, (category,))
-    #         result = self.cursor.fetchall()
-    #         questions = []
-    #         for q in result:
-    #             questions.append(Question(*q))
-
-    #         return questions
-
-    #     except mysql.connector.Error as err:
-    #         print(err)
 
     def get_questions(self, quiz):
         try:

@@ -1,6 +1,7 @@
+from unittest import result
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
-from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm
+from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm, CategoryForm
 from webquiz.models.QuizDB import QuizDB
 
 admin = Blueprint('admin', __name__, template_folder='templates')
@@ -252,7 +253,9 @@ def question():
 
             with QuizDB() as db:
                 result = db.get_categories()
-                questions = db.search_questions(category, search_text)            
+                questions = db.search_questions(category, search_text) 
+                for q in questions:
+                    q.answer = db.get_answer(q.id)           
 
         else:
             with QuizDB() as db:
@@ -290,7 +293,32 @@ def delete_question():
         return redirect(url_for('main.home'))
     
 
+@admin.route('/add-category', methods=['GET', 'POST'])
+@login_required
+def create_category():
+    if current_user.is_admin():
+        form = CategoryForm()
 
+        if form.validate_on_submit():
+            name = form.name.data
 
-    
+            with QuizDB() as db:
+                result = db.get_categories()
+                categories = [c[0].lower() for c in result]
+                if name.lower() in categories:
+                    flash(f'Kategorien {name} er allerede i databasen', 'error')
+                    return render_template('categoryForm.html', form=form)
+                else:
+                    if db.create_category(name):
+                        flash(f"Kategorien {name} opprettet", category='success')
+                    else:
+                        flash('En feil oppstod', 'error')
 
+                    return redirect(url_for('admin.question'))
+
+        if form.errors:
+            for message in form.errors.values():
+                flash(message, category='error')
+        return render_template('categoryForm.html', form=form)
+    else:
+        return redirect(url_for('main.home'))
