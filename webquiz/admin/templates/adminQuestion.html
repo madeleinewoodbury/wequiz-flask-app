@@ -1,0 +1,45 @@
+!{% extends "base.html" %}
+{% block content %}
+<div class="admin-question">
+    <header>
+        <h2 class="text-large text-primary">Spørsmålsbank</h2>
+        <div>
+            <a href="#" class="btn btn-primary">Ny kategori</a>
+        </div>
+    </header>
+    <form class="search" method="POST" action={{url_for('admin.question')}}>
+        <div class="search-text">
+            {{form.search(placeholder="Søk etter spørsmål")}}
+            {{form.submit(class="search-btn")}}
+        </div>
+        <div>
+            {{form.category}}
+        </div>
+    </form>
+    {% if questions %}
+    <section class="questions">
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>Spørsmål</th>
+                    <th>Svar</th>
+                    <th>Kategorie</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                <tr>
+                    <td>{{q.content}}</td>
+                    <td>{{q.answer.content}}</td>
+                    <td class='hide-sm'>{{q.category}}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+        {% endif %}
+    </section>
+</div>
+</div>
+
+{% endblock %}

@@ -1,3 +1,5 @@
+from cgitb import text
+from logging import PlaceHolder
 from random import choice
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, HiddenField, SelectField, TextAreaField, BooleanField, FieldList, FormField, Form
@@ -20,3 +22,8 @@ class QuestionForm(FlaskForm):
 class QuizForm(FlaskForm):
     title     = StringField("Tittel", validators=[DataRequired(), Length(min=2, max=45)])
     submit   = SubmitField("Lag Quiz")
+
+class SearchForm(FlaskForm):
+    category  = SelectField("Kategori")
+    search = StringField()
+    submit    = SubmitField("Søk")

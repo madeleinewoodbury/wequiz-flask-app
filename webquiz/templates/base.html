@@ -19,6 +19,9 @@
             <li>
                 <a href={{url_for('admin.create_quiz')}}>Ny Quiz</a>
             </li>
+            <li>
+                <a href="{{url_for('admin.question')}}">Spørsmål</a>
+            </li>
             {% else %}
             <li>
                 <a href={{url_for('main.quizzes')}}>Alle Quizzer</a>

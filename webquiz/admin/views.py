@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
-from webquiz.admin.forms import QuizForm, QuestionForm
+from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm
 from webquiz.models.QuizDB import QuizDB
 
 admin = Blueprint('admin', __name__, template_folder='templates')
@@ -73,6 +73,23 @@ def update_quiz():
 
     else:
         return redirect(url_for('main.home'))
+
+
+@admin.route('/delete/quiz', methods=['GET'])
+@login_required
+def delete_quiz():
+    if current_user.is_admin():
+        id = request.args['id']
+
+        with QuizDB() as db:
+            db.delete_quiz(id)
+            flash('Quiz slettet', 'success')
+
+        return redirect(url_for('admin.home'))
+
+    else:
+        return redirect(url_for('main.home'))
+
 
 @admin.route('/view_quiz', methods=['GET'])
 @login_required
@@ -220,6 +237,39 @@ def update_question():
                                form=form, 
                                quiz=quiz_id)
 
+    else:
+        return redirect(url_for('main.home'))
+
+@admin.route('/questions', methods=['GET', 'POST'])
+@login_required
+def question():
+    if current_user.is_admin():
+        form = SearchForm()
+
+        if request.method == 'POST':
+            search_text = form.search.data
+            category = form.category.data
+
+            with QuizDB() as db:
+                result = db.get_categories()
+                questions = db.search_questions(category, search_text)            
+
+        else:
+            with QuizDB() as db:
+                result = db.get_categories()
+                questions = db.get_all_questions()
+                for q in questions:
+                    q.answer = db.get_answer(q.id)
+
+        with QuizDB() as db:
+            result = db.get_categories()
+            form.category.choices = [(name[0], name[0]) for name in result]
+            form.category.choices.insert(0, ('', 'Alle kategorier'))
+        
+        return render_template('adminQuestion.html', 
+                               user=current_user, 
+                               questions=questions,
+                               form=form)
     else:
         return redirect(url_for('main.home'))
 

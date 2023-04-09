@@ -1,4 +1,3 @@
-from random import choice
 import mysql.connector
 from config import Database
 from webquiz.models.Quiz import Quiz
@@ -226,6 +225,34 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
+    def get_all_questions(self):
+        try:
+            query = """SELECT * FROM Question"""
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            questions = []
+            for q in result:
+                questions.append(Question(*q))
+
+            return questions
+
+        except mysql.connector.Error as err:
+            print(err)
+
+    # def get_questions_by_category(self, category):
+    #     try:
+    #         query = """SELECT * FROM Question WHERE category=(%s)"""
+    #         self.cursor.execute(query, (category,))
+    #         result = self.cursor.fetchall()
+    #         questions = []
+    #         for q in result:
+    #             questions.append(Question(*q))
+
+    #         return questions
+
+    #     except mysql.connector.Error as err:
+    #         print(err)
+
     def get_questions(self, quiz):
         try:
             query = """SELECT Q.id, Q.category, Q.content, Q.is_multiple_choice
@@ -351,7 +378,32 @@ class QuizDB(Database):
                 answers.append(Answer(*answer))
 
             return answers
+        except mysql.connector.Error as err:
+            print(err)
 
+
+    def search_questions(self, category, search_text):
+        try:
+            if category and search_text:
+                search_text = '%' + search_text + '%'
+                query = """SELECT * FROM Question WHERE content LIKE (%s) AND category=(%s)"""
+                self.cursor.execute(query, (search_text, category))
+            elif category:
+                query = """SELECT * FROM Question WHERE category=(%s)"""
+                self.cursor.execute(query, (category,))
+            elif search_text:
+                search_text = '%' + search_text + '%'
+                query = """SELECT * FROM Question WHERE content LIKE (%s)"""
+                self.cursor.execute(query, (search_text,))
+            else:
+                query = """SELECT * FROM Question"""
+                self.cursor.execute(query)
+
+            result = self.cursor.fetchall()
+            questions = []
+            for q in result:
+                questions.append(Question(*q))
+            return questions
         except mysql.connector.Error as err:
             print(err)
 
