@@ -1,7 +1,7 @@
 !{% extends "base.html" %}
 {% block content %}
 {% if quiz %}
-<div class="quiz">
+<section class="quiz">
     <h2 class="text-large text-primary">Quiz: {{quiz.title}}</h2>
     <div class="info">
         <div class="btn-container">
@@ -17,35 +17,33 @@
         {% endif %}
     </div>
     {% if quiz.questions %}
-    <div class="question">
-        <table class='table'>
-            <thead>
-                <tr>
-                    <th>Spørsmål</th>
-                    <th>Kategorie</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in quiz.questions %}
-                <tr>
-                    <td>{{q.content}}</td>
-                    <td class='hide-sm'>{{q.category}}</td>
-                    <td>
-                        <a href={{url_for('admin.update_question', quiz=quiz.id, id=q.id)}}
-                            class="btn btn-light">Rediger</a>
-                        <a href={{url_for('admin.delete_quiz_question', quiz=quiz.id, id=q.id)}}
-                            class="btn btn-danger">Slett
-                            fra quiz</a>
-                    </td>
-                </tr>
-                {% endfor %}
+    <table class='table'>
+        <thead>
+            <tr>
+                <th>Spørsmål</th>
+                <th>Kategorie</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in quiz.questions %}
+            <tr>
+                <td>{{q.content}}</td>
+                <td class='hide-sm'>{{q.category}}</td>
+                <td>
+                    <a href={{url_for('admin.update_question', quiz=quiz.id, id=q.id)}}
+                        class="btn btn-light">Rediger</a>
+                    <a href={{url_for('admin.delete_quiz_question', quiz=quiz.id, id=q.id)}}
+                        class="btn btn-danger">Slett
+                        fra quiz</a>
+                </td>
+            </tr>
+            {% endfor %}
 
-            </tbody>
-        </table>
-        {% endif %}
-    </div>
-</div>
+        </tbody>
+    </table>
+    {% endif %}
+</section>
 
 {% endif %}
 {% endblock %}

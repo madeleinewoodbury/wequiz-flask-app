@@ -1,37 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 {% if user %}
-<div class="results">
+<section class="results">
     <h2 class="text-large text-primary">Besvarelser for {{title}}</h2>
 
-    <section>
-        {% if quizzes %}
+    {% if quizzes %}
 
-        <table class='table'>
-            <thead>
-                <tr>
-                    <th>Resultat</th>
-                    <th>Dato Tatt</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in quizzes %}
-                <tr>
-                    <td>{{q.score}} %</td>
-                    <td>{{q.date_taken}}</td>
-                    <td>
-                        <a href="{{url_for('admin.quiz_user_answers', id=q.id)}}" class="btn btn-primary">Se svar</a>
-                    </td>
-                </tr>
-                {% endfor %}
+    <table class='table'>
+        <thead>
+            <tr>
+                <th>Resultat</th>
+                <th>Dato Tatt</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in quizzes %}
+            <tr>
+                <td>{{q.score}} %</td>
+                <td>{{q.date_taken}}</td>
+                <td>
+                    <a href="{{url_for('admin.quiz_user_answers', id=q.id)}}" class="btn btn-primary">Se svar</a>
+                </td>
+            </tr>
+            {% endfor %}
 
-            </tbody>
-        </table>
-        {% else %}
-        <p>Fant ingen besvarelser</p>
-        {% endif %}
-    </section>
+        </tbody>
+    </table>
+    {% else %}
+    <p>Fant ingen besvarelser</p>
     {% endif %}
-</div>
+    {% endif %}
+</section>
 {% endblock %}

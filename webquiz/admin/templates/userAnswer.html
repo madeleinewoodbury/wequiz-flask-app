@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="quiz">
+<section class="quiz">
     {% if quiz %}
     <h2 class="text-large text-primary">{{quiz.title}} ({{quiz.score}} %)</h2>
     <div class="info">
@@ -25,5 +25,5 @@
     {% endfor %}
     {% endif %}
 
-</div>
+</section>
 {% endblock %}

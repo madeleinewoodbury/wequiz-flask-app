@@ -25,7 +25,7 @@ def login():
             if role.lower() == 'administrator':
                 if user.is_admin():
                     flash('Logged in successfully!', category='success')
-                    return redirect(url_for('main.home'))
+                    return redirect(url_for('admin.home'))
                 else:
                     flash('Not Authorized', category='error')
             else:

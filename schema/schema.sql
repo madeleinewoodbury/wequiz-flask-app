@@ -130,15 +130,3 @@ INSERT INTO `Choice` (`id`, `question`, `content`, `is_correct`) VALUES
 ('f3226330-8d39-4a89-b6d6-218b68c5bedc', '1148f0bb-e0bf-4799-9b05-15ca2aa7ab48', 'Carola', 0),
 ('ffcefc50-bd14-4e5a-8885-e11954a509ac', '73a8294c-afbc-4c61-99a3-3288b0c987ac', '41', 0);
 
-
-'3e93c12d-0ce7-4ca7-bcc7-d7f9d9ff1d04'
-
-SELECT Q.id, Q.content, A.content,
-    (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
-FROM Question AS Q
-INNER JOIN Answer AS A ON A.question = Q.id
-
-
-
-FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
-WHERE A.user_quiz=(%s)

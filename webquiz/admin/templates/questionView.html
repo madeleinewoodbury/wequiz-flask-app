@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="question-detail">
+<section class="question-detail">
     {% if question %}
     <div class="btn-container">
         <a class="btn btn-primary" href="{{url_for('admin.add_quiz_question', id=question.id)}}">Legg til quiz</a>
@@ -48,5 +48,5 @@
 
 
     {% endif %}
-</div>
+</section>
 {% endblock %}

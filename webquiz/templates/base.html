@@ -20,6 +20,9 @@
                 <a href={{url_for('admin.create_quiz')}}>Ny Quiz</a>
             </li>
             <li>
+                <a href="{{url_for('admin.create_question', quiz_id='')}}">Nytt Spørsmål</a>
+            </li>
+            <li>
                 <a href="{{url_for('admin.question')}}">Spørsmålsbank</a>
             </li>
             <li>
@@ -28,6 +31,9 @@
             {% else %}
             <li>
                 <a href={{url_for('main.quizzes')}}>Alle Quizzer</a>
+            </li>
+            <li>
+                <a href={{url_for('main.home')}}>Dine Quizzer</a>
             </li>
             {% endif %}
             <li>
@@ -53,30 +59,10 @@
             {% endwith %}
         </div>
 
-
         {% block content %}
         {% endblock %}
     </main>
 </body>
-<script>
-    function removeFlash() {
-        const flashMessage = document.getElementById('flash-message');
-        flashMessage.remove();
-    }
-
-    setTimeout(() => {
-        const alerts = document.getElementById('alert-container');
-        alerts.remove();
-    }, "5000");
-
-    let isMultipleChoice = document.getElementById('is_multiple_choice')
-    let choices = document.getElementById('choices')
-    isMultipleChoice.onchange = function () {
-        choices.classList.contains('hidden')
-            ? choices.classList.remove('hidden')
-            : choices.classList.add('hidden')
-    }
-
-</script>
+<script src="{{url_for('static', filename='app.js')}}"></script>
 
 </html>

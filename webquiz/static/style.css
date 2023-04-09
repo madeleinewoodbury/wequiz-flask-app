@@ -201,6 +201,14 @@ textarea {
   border: 1px solid #ccc;
 }
 
+#choices textarea {
+  margin: 0.2rem 0;
+}
+
+#choices textarea:last-of-type {
+  margin-bottom: 1rem;
+}
+
 .check-form {
   display: flex;
   align-items: center;
@@ -384,8 +392,14 @@ textarea {
 }
 
 @media (max-width: 700px) {
+  .text-large {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
   .container {
-    margin-top: 8rem;
+    margin-top: 10rem;
   }
 
   .navbar {

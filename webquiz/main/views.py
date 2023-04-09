@@ -22,15 +22,12 @@ def home():
 @main.route('/quizzes')
 @login_required
 def quizzes():
-    if current_user.is_admin():
-        return redirect(url_for('admin.home'))
-    
     with QuizDB() as db:
         quizzes = db.get_quizzes()
         user_attempts = {}
         for quiz in quizzes:
             user_attempts[quiz.id] = db.get_quiz_attempts(quiz.id, current_user.id)
-            quiz.questions = db.get_questions_v2(quiz.id)
+            quiz.questions = db.get_questions(quiz.id)
         
     return render_template('quizzes.html', 
                            user=current_user, 
@@ -44,6 +41,7 @@ def quiz():
 
     with QuizDB() as db:
         quiz = db.get_quiz(quiz_id)
+
         if not quiz.is_active:
             flash('Denne quizzen er ikke lenger aktiv', 'error')        
             return redirect(url_for('main.home'))
@@ -71,7 +69,7 @@ def quiz_question():
 
     with QuizDB() as db:
         quiz = db.get_quiz(quiz_id)
-        quiz.questions = db.get_questions_v2(quiz_id)
+        quiz.questions = db.get_questions(quiz_id)
         for q in quiz.questions:
             q.choices = db.get_choices(q.id)        
 
@@ -104,7 +102,7 @@ def quiz_question():
     
         form.answer.data = ""
         form.question_id.data = question.id
-        return render_template('question.html', 
+        return render_template('forms/addAnswer.html', 
                                 user_quiz_id=user_quiz_id,
                                 quiz_id=quiz_id,
                                 form=form, 
@@ -153,7 +151,7 @@ def edit_answer():
 
     form.answer.data = answer.content
     form.question_id.data = question.id
-    return render_template('editAnswer.html', 
+    return render_template('forms/editAnswer.html', 
                             quiz_id=quiz_id,
                             form=form, 
                             question=question)
@@ -165,7 +163,7 @@ def quiz_results():
 
     with QuizDB() as db:
         user_quiz = db.get_user_quiz(id)
-        user_quiz.questions = db.get_questions_v2(user_quiz.quiz)
+        user_quiz.questions = db.get_questions(user_quiz.quiz)
         user_quiz.answers = db.get_answers_with_result(id)
         user_quiz.calculate_score()
         attempts = db.get_quiz_attempts(user_quiz.quiz, current_user.id)

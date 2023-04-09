@@ -1,4 +1,3 @@
-from unittest import result
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
 from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm, CategoryForm, QuizSelectForm
@@ -14,7 +13,7 @@ def home():
         with QuizDB() as db:
             quizzes = db.get_quizzes()
             for quiz in quizzes:
-                quiz.questions = db.get_questions_v2(quiz.id)
+                quiz.questions = db.get_questions(quiz.id)
                 
         return render_template('admin.html', 
                                user=current_user, 
@@ -43,7 +42,7 @@ def create_quiz():
         if form.errors:
             for message in form.errors.values():
                 flash(message, category='error')
-        return render_template('quizForm.html', form=form)
+        return render_template('forms/addQuiz.html', form=form)
     else:
         return redirect(url_for('main.home'))
 
@@ -70,7 +69,7 @@ def update_quiz():
         
         form.title.data = quiz.title
         form.submit.label.text = "Lagre"
-        return render_template('editQuizForm.html', form=form, id=id)
+        return render_template('forms/editQuiz.html', form=form, id=id)
 
     else:
         return redirect(url_for('main.home'))
@@ -120,7 +119,7 @@ def quiz_user_answers():
 
         with QuizDB() as db:
             user_quiz = db.get_user_quiz(id)
-            user_quiz.questions = db.get_questions_v2(user_quiz.quiz)
+            user_quiz.questions = db.get_questions(user_quiz.quiz)
             user_quiz.answers = db.get_answers_with_result(id)
             user_quiz.calculate_score()    
 
@@ -140,27 +139,27 @@ def quiz():
 
         with QuizDB() as db:
             quiz = db.get_quiz(id)
-            db.get_questions(quiz)
+            quiz.questions = db.get_questions(id)
 
-        return render_template('adminQuiz.html', quiz=quiz)
+        return render_template('adminQuiz.html', quiz=quiz, user=current_user)
     else:
         return redirect(url_for('main.home'))
 
 @admin.route('/activate', methods=['GET'])
 @login_required
 def activate():
-    id = request.args['id']
-    status = request.args['status']
-    status_text = 'aktiv' if int(status) else 'ikke aktiv'
+    if current_user.is_admin():
+        id = request.args['id']
+        status = request.args['status']
+        status_text = 'aktiv' if int(status) else 'ikke aktiv'
 
-    with QuizDB() as db:
-        db.update_status(id, status)
-    
-    flash(f'Status satt til {status_text}', 'success')
-
-
+        with QuizDB() as db:
+            db.update_status(id, status)
         
-    return redirect(url_for('admin.quiz', id=id))
+        flash(f'Status satt til {status_text}', 'success')
+        return redirect(url_for('admin.quiz', id=id))
+    else:
+        return redirect(url_for('main.home'))
 
 @admin.route('/add-question', methods=['GET', 'POST'])
 @login_required
@@ -179,7 +178,9 @@ def create_question():
                 id = db.create_question(category=form.category.data, 
                                         content=form.content.data, 
                                         multiple_choice=multiple_choice)
-                db.create_quiz_question(quiz_id=quiz_id, question_id=id)
+                if quiz_id:
+                    db.create_quiz_question(quiz_id=quiz_id, question_id=id)
+                
                 db.create_choice(question_id=id, content=form.answer.data, is_correct=True)
 
                 if multiple_choice:
@@ -190,9 +191,11 @@ def create_question():
                                              is_correct=False)
 
             flash('Spørsmål lagt til', 'success')
-            return redirect(url_for('admin.quiz', id=quiz_id))
-
-        return render_template('questionForm.html', form=form, quiz_id=quiz_id)
+            if quiz_id:
+                return redirect(url_for('admin.quiz', id=quiz_id, user=current_user))
+            else:
+                return redirect(url_for('admin.question', user=current_user))
+        return render_template('forms/addQuestion.html', form=form, quiz_id=quiz_id)
     
     else:
         return redirect(url_for('main.home'))
@@ -257,9 +260,9 @@ def update_question():
         form.answer.data = answer.content
         
         if quiz_id:
-            return render_template('editQuestion.html', form=form, quiz=quiz_id)
+            return render_template('forms/editQuestion.html', form=form, quiz=quiz_id)
         else:
-            return render_template('editQuestion.html', form=form)
+            return render_template('forms/editQuestion.html', form=form)
 
     else:
         return redirect(url_for('main.home'))
@@ -276,7 +279,7 @@ def question_detail():
             question.choices = db.get_alternatives(id)
             question.quizzes = db.get_quizzes_by_question(id)
 
-        return render_template('questionView.html', question=question)
+        return render_template('questionView.html', question=question, user=current_user)
     else:
         return redirect(url_for('main.home'))
     
@@ -340,7 +343,7 @@ def add_quiz_question():
                 form.quiz.choices = choices
                 form.id.data = id
         
-                return render_template('addToQuiz.html', form=form)
+                return render_template('forms/addToQuiz.html', form=form)
             else:
                 flash('Ingen tilgjengelige quizzer', 'error')
                 return redirect(url_for('admin.question_detail', id=id))
@@ -399,7 +402,7 @@ def create_category():
                 categories = [c[0].lower() for c in result]
                 if name.lower() in categories:
                     flash(f'Kategorien {name} er allerede i databasen', 'error')
-                    return render_template('categoryForm.html', form=form)
+                    return render_template('forms/addCategory.html', form=form)
                 else:
                     if db.create_category(name):
                         flash(f"Kategorien {name} opprettet", category='success')
@@ -411,6 +414,6 @@ def create_category():
         if form.errors:
             for message in form.errors.values():
                 flash(message, category='error')
-        return render_template('categoryForm.html', form=form)
+        return render_template('forms/addCategory.html', form=form)
     else:
         return redirect(url_for('main.home'))

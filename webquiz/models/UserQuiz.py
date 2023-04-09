@@ -8,17 +8,7 @@ class UserQuiz:
         self.answers = []
         self.questions = []
         self.results = []
-        # self.correct = 0
         self.score = 0
-    
-    def add_answer(self, answer):
-        self.answers.append(answer)
-
-    def add_question(self, question):
-        self.questions.append(question)
-
-    # def calculate_score(self):
-    #     self.score = round((self.correct * 100) / len(self.questions))
 
     def calculate_score(self):
         correct = len([a for a in self.answers if a.is_correct])

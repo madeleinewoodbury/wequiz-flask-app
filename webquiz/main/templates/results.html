@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="quiz">
+<section class="quiz">
     {% if quiz %}
     <h2 class="text-large text-primary">{{quiz.title}} ({{quiz.score}} %)</h2>
     <div class="info">
@@ -29,5 +29,5 @@
         {% endif %}
         <a href="{{url_for('main.home')}}" class="btn btn-primary">Dine Quizzer</a>
 
-</div>
+</section>
 {% endblock %}

@@ -27,13 +27,9 @@ class QuizDB(Database):
     def create_question(self, category, content, multiple_choice):
         try:
             id = str(uuid4())
-            question = Question(id, category, content, multiple_choice)
             query = """INSERT INTO Question (id, category, content, is_multiple_choice)
                        VALUES (%s, %s, %s, %s)"""
-            values = (question.id, 
-                      question.category,
-                      question.content,
-                      question.is_multiple_choice)
+            values = (id, category, content, multiple_choice)
             self.cursor.execute(query, values)
             return id
         
@@ -43,7 +39,6 @@ class QuizDB(Database):
     def create_choice(self, question_id, content, is_correct):
         try:
             id = str(uuid4())
-            # choice = Choice(id, question_id, content, is_correct)
             query = """INSERT INTO Choice (id, question, content, is_correct)
                        VALUES (%s, %s, %s, %s)"""
             values = (id, question_id, content, is_correct)
@@ -277,22 +272,7 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
-    def get_questions(self, quiz):
-        try:
-            query = """SELECT Q.id, Q.category, Q.content, Q.is_multiple_choice
-                       FROM Question AS Q
-                       INNER JOIN QuizQuestion AS QQ ON QQ.question = Q.id 
-                       WHERE QQ.quiz=(%s)"""
-            self.cursor.execute(query, (quiz.id,))
-            result = self.cursor.fetchall()
-
-            for question in result:
-                quiz.add_question(Question(*question))
-
-        except mysql.connector.Error as err:
-            print(err)
-
-    def get_questions_v2(self, quiz_id):
+    def get_questions(self, quiz_id):
         try:
             query = """SELECT Q.id, Q.category, Q.content, Q.is_multiple_choice
                        FROM Question AS Q
@@ -482,7 +462,7 @@ class QuizDB(Database):
                 answer = Answer(user_quiz_id, question_id, user_answer)
                 answer.question_content = question
 
-                if user_answer == correct_answer:
+                if user_answer.lower() == correct_answer.lower():
                     answer.is_correct = True
 
                 answers.append(answer)
