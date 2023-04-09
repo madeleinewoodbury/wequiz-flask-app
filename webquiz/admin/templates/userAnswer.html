@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="quiz">
+    {% if quiz %}
+    <h2 class="text-large text-primary">{{quiz.title}} ({{quiz.score}} %)</h2>
+    <div class="info">
+        <h3>Antall riktige svar: {{quiz.correct}} av {{answers}}</h3>
+        <span>{{quiz.date_taken}}</span>
+    </div>
+    {% for i in range(0, answers)%}
+    {% if quiz.answers[i].is_correct %}
+    <div class="answer-result correct">
+        <h3>Spørsmål {{i+1}}: Riktig!</h3>
+        <p>{{quiz.answers[i].question_content}}</p>
+        <p>{{quiz.answers[i].content}}</p>
+    </div>
+    {% else %}
+    <div class="answer-result wrong">
+        <h3>Spørsmål {{i+1}}: Feil</h3>
+        <p>{{quiz.answers[i].question_content}}</p>
+        <p>{{quiz.answers[i].content}}</p>
+    </div>
+
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ from unittest import result
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_required, current_user
 from webquiz.admin.forms import QuizForm, QuestionForm, SearchForm, CategoryForm, QuizSelectForm
+from webquiz.main.views import quizzes
 from webquiz.models.QuizDB import QuizDB
 
 admin = Blueprint('admin', __name__, template_folder='templates')
@@ -21,7 +22,6 @@ def home():
     else:
         return redirect(url_for('main.home'))
     
-
 @admin.route('/add-quiz', methods=['GET', 'POST'])
 @login_required
 def create_quiz():
@@ -75,7 +75,6 @@ def update_quiz():
     else:
         return redirect(url_for('main.home'))
 
-
 @admin.route('/delete/quiz', methods=['GET'])
 @login_required
 def delete_quiz():
@@ -90,26 +89,49 @@ def delete_quiz():
 
     else:
         return redirect(url_for('main.home'))
-
-
-@admin.route('/view_quiz', methods=['GET'])
+    
+@admin.route('/quiz/results', methods=['GET'])
 @login_required
-def view_quiz():
+def quiz_results():
     if current_user.is_admin():
         id = request.args['id']
 
         with QuizDB() as db:
             quiz = db.get_quiz(id)
-            db.get_questions(quiz)
-            for question in quiz.questions:
-                db.get_user_answers(question)
+            quizzes = db.get_user_quizzes_by_quiz(id)
 
-        return render_template('quizView.html', quiz=quiz)
+            for q in quizzes:
+                q.answers = db.get_answers_with_result(q.id)
+                q.calculate_score()
+
+        return render_template('quizResults.html', 
+                               quizzes=quizzes, 
+                               title=quiz.title, 
+                               user=current_user)
 
     else:
         return redirect(url_for('main.home'))
     
+@admin.route('/quiz/user_answers', methods=['GET'])
+@login_required
+def quiz_user_answers():
+    if current_user.is_admin():
+        id = request.args['id']
 
+        with QuizDB() as db:
+            user_quiz = db.get_user_quiz(id)
+            user_quiz.questions = db.get_questions_v2(user_quiz.quiz)
+            user_quiz.answers = db.get_answers_with_result(id)
+            user_quiz.calculate_score()    
+
+        return render_template('userAnswer.html', 
+                               quiz=user_quiz, 
+                               answers=len(user_quiz.answers),
+                               user=current_user)
+
+    else:
+        return redirect(url_for('main.home'))
+    
 @admin.route('/quiz', methods=['GET'])
 @login_required
 def quiz():
@@ -123,7 +145,6 @@ def quiz():
         return render_template('adminQuiz.html', quiz=quiz)
     else:
         return redirect(url_for('main.home'))
-
 
 @admin.route('/activate', methods=['GET'])
 @login_required
@@ -140,7 +161,6 @@ def activate():
 
         
     return redirect(url_for('admin.quiz', id=id))
-
 
 @admin.route('/add-question', methods=['GET', 'POST'])
 @login_required
@@ -177,7 +197,6 @@ def create_question():
     else:
         return redirect(url_for('main.home'))
     
-
 @admin.route('/edit-question', methods=['GET', 'POST'])
 @login_required
 def update_question():
@@ -261,7 +280,6 @@ def question_detail():
     else:
         return redirect(url_for('main.home'))
     
-
 @admin.route('/questions', methods=['GET', 'POST'])
 @login_required
 def question():
@@ -330,7 +348,6 @@ def add_quiz_question():
     else:
         return redirect(url_for('main.home'))
 
-
 @admin.route('/delete/question', methods=['GET'])
 @login_required
 def delete_question():
@@ -349,7 +366,24 @@ def delete_question():
 
     else:
         return redirect(url_for('main.home'))
-    
+
+@admin.route('/delete/quizquestion', methods=['GET'])
+@login_required
+def delete_quiz_question():
+    if current_user.is_admin():
+        id = request.args['id']
+        quiz_id = request.args['quiz']
+
+        with QuizDB() as db:
+            if db.delete_quiz_question(quiz_id, id):
+                flash('Spørsmål slettet fra quiz', 'success')
+            else: 
+                flash('Det oppstod en feil', 'error')
+
+        return redirect(url_for('admin.quiz', id=quiz_id))
+
+    else:
+        return redirect(url_for('main.home'))
 
 @admin.route('/add-category', methods=['GET', 'POST'])
 @login_required

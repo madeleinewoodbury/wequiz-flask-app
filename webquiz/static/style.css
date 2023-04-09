@@ -366,6 +366,10 @@ textarea {
   border-radius: 5px;
 }
 
+.answer-result.admin {
+  background-color: #5a3f2d;
+}
+
 .answer-result.correct {
   background-color: var(--success-color);
 }

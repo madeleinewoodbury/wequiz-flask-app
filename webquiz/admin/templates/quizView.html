@@ -1,4 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-<h2 class="text-large text-primary">Quiz View</h2>
+<div class="quiz_view">
+    {% if quiz %}
+    <h2 class="text-large text-primary">{{quiz.title}}</h2>
+    {% for question in quiz.questions %}
+    <div class="answer-result admin">
+        <h3>Spørsmål</h3>
+        <p>{{question.content}}</p>
+        <h3>Riktig svar</h3>
+        <p>{{question.answer.content}}</p>
+        {% for answer in question.user_answers %}
+        <ul>
+            <li>bah</li>
+        </ul>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
 {% endblock %}

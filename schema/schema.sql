@@ -131,56 +131,14 @@ INSERT INTO `Choice` (`id`, `question`, `content`, `is_correct`) VALUES
 ('ffcefc50-bd14-4e5a-8885-e11954a509ac', '73a8294c-afbc-4c61-99a3-3288b0c987ac', '41', 0);
 
 
--- SELECT content, date_taken 
--- FROM Answer
--- INNER JOIN UserQuiz 
--- ON UserQuiz.id = Answer.user_quiz 
--- WHERE question = "1148f0bb-e0bf-4799-9b05-15ca2aa7ab48";
+'3e93c12d-0ce7-4ca7-bcc7-d7f9d9ff1d04'
+
+SELECT Q.id, Q.content, A.content,
+    (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
+FROM Question AS Q
+INNER JOIN Answer AS A ON A.question = Q.id
 
 
--- SELECT 
---     Q.id, 
---     Q.category, 
---     Q.content, 
---     Q.is_multiple_choice
--- FROM Question AS Q
--- INNER JOIN QuizQuestion AS QQ 
---     ON QQ.question = Q.id 
--- WHERE QQ.quiz="4e68a8a5-ef11-426b-bdc3-2d0c12c0c338";
 
--- SELECT 
---     COUNT(*) 
--- FROM UserQuiz 
--- WHERE
---     quiz="4e68a8a5-ef11-426b-bdc3-2d0c12c0c338" AND
---     user="ba0a424e-8dc7-47e8-97e0-4824d812f4bf";
-
--- SELECT 
---     Q.id,
---     Q.title,
--- FROM UserQuiz AS U
--- INNER JOIN Quiz AS Q
--- ON Q.id = U.quiz
--- GROUP BY Q.id;
-
--- -- get quiz score
--- SELECT 
---     U.id,
---     U.quiz,
---     Q.title,
---     SUM(CASE 
---         WHEN A.content = (SELECT C.content FROM Choice AS C 
---                           WHERE C.question = A.question AND C.is_correct=1) THEN 1
---         ELSE 0
---     END) AS 'is_correct',
---     (SELECT COUNT(*) FROM QuizQuestion AS QQ WHERE QQ.quiz = Q.id) AS questions
--- FROM UserQuiz AS U
--- INNER JOIN Answer AS A ON A.user_quiz = U.id
--- INNER JOIN Quiz AS Q ON Q.id = U.quiz
--- WHERE U.id="bec45daa-8897-49af-ae89-aed683cc7d30";
-
-SELECT * FROM Quiz
-WHERE id NOT IN (
-SELECT Q.id FROM Quiz AS Q
-INNER JOIN QuizQuestion AS QQ ON QQ.quiz = Q.id 
-WHERE QQ.question = "e2b43992-c2fc-4fec-b378-1fc39a9fbc82");
+FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
+WHERE A.user_quiz=(%s)

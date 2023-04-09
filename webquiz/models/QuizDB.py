@@ -214,6 +214,34 @@ class QuizDB(Database):
             return quizzes
         except mysql.connector.Error as err:
             print(err)
+    
+    def get_user_quizzes_by_quiz(self, quiz_id):
+        try:
+            query = """SELECT U.id, U.quiz, U.date_taken, Q.title,
+                       SUM(CASE WHEN A.content = (SELECT C.content FROM Choice AS C 
+                                                  WHERE C.question = A.question AND C.is_correct=1) 
+                                THEN 1 ELSE 0
+                            END) AS is_correct
+                        FROM UserQuiz AS U
+                        INNER JOIN Answer AS A ON A.user_quiz = U.id
+                        INNER JOIN Quiz AS Q ON Q.id = U.quiz
+                        WHERE U.quiz=(%s)
+                        GROUP BY U.id
+                        ORDER BY U.date_taken DESC"""
+        
+            self.cursor.execute(query, (quiz_id,))
+            result = self.cursor.fetchall()
+            quizzes = []
+            for quiz in result:
+                id, quiz_id, date_taken, title, correct_answers = quiz
+                user_quiz = UserQuiz(id, quiz_id, user="Anonym", date_taken=date_taken)
+                user_quiz.title = title
+                user_quiz.correct = correct_answers
+                quizzes.append(user_quiz)
+
+            return quizzes
+        except mysql.connector.Error as err:
+            print(err)
 
     def get_quiz_attempts(self, quiz_id, user_id):
         try:
@@ -248,7 +276,6 @@ class QuizDB(Database):
 
         except mysql.connector.Error as err:
             print(err)
-
 
     def get_questions(self, quiz):
         try:
@@ -384,18 +411,20 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
-    def get_user_answers(self, question):
+    def get_user_answers(self, question_id):
         try:
             query = """SELECT A.user_quiz, content FROM Answer AS A
                        INNER JOIN UserQuiz ON UserQuiz.id = A.user_quiz 
                        WHERE question=(%s)"""
-            self.cursor.execute(query, (question.id,))
+            self.cursor.execute(query, (question_id,))
             result = self.cursor.fetchall()
+            answers = []
             for answer in result:
                 user_quiz, content = answer
-                user_answer = Answer(user_quiz, question.id, content)
-                question.add_user_answer(user_answer)
+                user_answer = Answer(user_quiz, question_id, content)
+                answers.append(user_answer)
 
+            return answers
         except mysql.connector.Error as err:
             print(err)
 
@@ -411,7 +440,6 @@ class QuizDB(Database):
             return answers
         except mysql.connector.Error as err:
             print(err)
-
 
     def search_questions(self, category, search_text):
         try:
@@ -438,6 +466,32 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
+    def get_answers_with_result(self, user_quiz_id):
+        try:
+            query = """SELECT Q.id, Q.content, A.content,
+                       (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
+                        FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
+                        WHERE A.user_quiz=(%s)"""
+            
+            self.cursor.execute(query, (user_quiz_id,))
+            result = self.cursor.fetchall()
+            answers = []
+
+            for item in result:
+                question_id, question, user_answer, correct_answer = item
+                answer = Answer(user_quiz_id, question_id, user_answer)
+                answer.question_content = question
+
+                if user_answer == correct_answer:
+                    answer.is_correct = True
+
+                answers.append(answer)
+
+            return answers   
+
+        except mysql.connector.Error as err:
+            print(err)
+    
     # DELETE
     def delete_quiz(self, id):
         try:
@@ -454,6 +508,18 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
 
+    def delete_quiz_question(self, quiz_id, question_id):
+        try:
+            query = """DELETE FROM QuizQuestion
+                    WHERE quiz=(%s) AND question=(%s)"""
+            self.cursor.execute(query, (quiz_id, question_id))
+
+            return True
+        except mysql.connector.Error as err:
+            print(err)
+        
+        return False
+
     def delete_choice(self, id):
         try:
             query = """DELETE FROM Choice
@@ -462,28 +528,4 @@ class QuizDB(Database):
         except mysql.connector.Error as err:
             print(err)
     
-    def get_answers_with_result(self, user_quiz_id):
-        try:
-            query = """SELECT Q.id, Q.content, A.content,
-                       (SELECT C.content FROM Choice AS C WHERE C.question = A.question AND C.is_correct=1)
-                        FROM Answer AS A INNER JOIN Question AS Q ON Q.id = A.question
-                        WHERE A.user_quiz=(%s)"""
-            
-            self.cursor.execute(query, (user_quiz_id,))
-            result = self.cursor.fetchall()
-            answers = []
-            
-            for item in result:
-                question_id, question, user_answer, correct_answer = item
-                answer = Answer(user_quiz_id, question_id, user_answer)
-                answer.question_content = question
 
-                if user_answer == correct_answer:
-                    answer.is_correct = True
-
-                answers.append(answer)
-
-            return answers   
-
-        except mysql.connector.Error as err:
-            print(err)

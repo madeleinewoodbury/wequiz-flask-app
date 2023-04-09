@@ -14,7 +14,7 @@ def home():
     with QuizDB() as db:
         user_quizzes = db.get_user_quizzes(current_user.id)
         for quiz in user_quizzes:
-            quiz.questions = db.get_questions_v2(quiz_id=quiz.quiz)
+            quiz.answers = db.get_answers_with_result(quiz.id)
             quiz.calculate_score()
         
     return render_template('home.html', user=current_user, quizzes=user_quizzes)
@@ -158,7 +158,7 @@ def edit_answer():
                             form=form, 
                             question=question)
 
-@main.route('/quiz_results')
+@main.route('/user_quiz/results')
 @login_required
 def quiz_results():
     id = request.args['id']

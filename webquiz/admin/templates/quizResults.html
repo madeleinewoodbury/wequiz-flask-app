@@ -1,38 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
 {% if user %}
-<div class="dashboard">
-    <h2 class="text-large text-primary">Velkommen {{user.firstname}}</h2>
+<div class="results">
+    <h2 class="text-large text-primary">Besvarelser for {{title}}</h2>
 
     <section>
-        <div class="intro">
-            <h3>Dine Quizzer</h3>
-            <a href="{{url_for('main.quizzes')}}" class="btn btn-primary">Ta en ny quiz</a>
-        </div>
         {% if quizzes %}
 
-        <table class='table link-table'>
+        <table class='table'>
             <thead>
                 <tr>
-                    <th>Quiz</th>
                     <th>Resultat</th>
                     <th>Dato Tatt</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for q in quizzes %}
                 <tr>
-                    <td><a href="{{url_for('main.quiz_results', id=q.id)}}" class="quiz-link">{{q.title}}</a>
-                    </td>
                     <td>{{q.score}} %</td>
                     <td>{{q.date_taken}}</td>
+                    <td>
+                        <a href="{{url_for('admin.quiz_user_answers', id=q.id)}}" class="btn btn-primary">Se svar</a>
+                    </td>
                 </tr>
                 {% endfor %}
 
             </tbody>
         </table>
         {% else %}
-        <p>Du har ikke tatt noen quizzer enda</p>
+        <p>Fant ingen besvarelser</p>
         {% endif %}
     </section>
     {% endif %}

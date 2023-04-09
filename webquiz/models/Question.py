@@ -13,7 +13,5 @@ class Question:
     def add_choice(self, choice):
         self.choices.append(choice)
 
-    def add_user_answer(self, answer):
-        self.user_answers.append(answer)
 
 
